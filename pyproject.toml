@@ -1,0 +1,42 @@
+[project]
+name = "baby-rag-history"
+version = "0.1.0"
+description = "Nine RAG milestones in one LangGraph state machine"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=1.2",
+    "langchain-core>=1.0",
+    "langchain-openai>=1.8",
+    "langchain-chroma>=1.1",
+    "chromadb>=1.0",
+    "rank-bm25>=0.2",
+    "jieba>=0.42",
+    "httpx>=0.27",
+    "tiktoken>=0.14",
+    "pyarrow>=20",
+    "chonkie>=1.7",
+    "zhconv>=1.4",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+    "typer>=0.15",
+    "rich>=13.0",
+]
+
+[project.scripts]
+babyrag = "babyrag.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/babyrag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
