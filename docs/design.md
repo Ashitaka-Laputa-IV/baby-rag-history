@@ -409,3 +409,24 @@ key = sha256(stage | prompt_version | model | normalized_input)
 结论：**r5 contextual 与 r2 rerank 是本期真正的赢家**；HyDE/multi-query 在中文维基上没有增益；
 GraphRAG 的排除不影响上述结论（RAPTOR 已覆盖全局题）。`doc recall@5` 在 1,000 篇上仍为 100%，
 说明「找对文档」已饱和，差异在 chunk 级排序。
+
+---
+
+## 13. 拉开差距的四步（已完成）
+
+1. **换主指标**：`chunk@1`、`chunk@3`、`chunk@5`、`MRR@10`、`nDCG@10`、`doc@1`。原题上 `chunk@1` 已有 74–85% 的跨度。
+2. **去标题泄漏**：把 chunk 与 query 里的标题替换成「（标题已隐藏）」，并加入 200 篇同姓/同类型干扰文档 → 1,200 篇 / 5,676 chunks。
+3. **手写难题集**：29 道中文问题，避开文档标题但保留年份/地区/职业限定词；evidence 全部校验落在 gold 文档内。
+4. **hard negatives**：200 篇同标题前缀的干扰文档（利用 `corpus.rule.jsonl` 挖掘）。
+
+结果：
+
+| 设置 | acc 范围 | chunk@1 范围 |
+|---|---|---|
+| 原题 + 原索引 | 88.9–100% | 74.1–85.2% |
+| 原题 + masked | 66.7–80.0% | 29.6–59.3% |
+| 难题 + 原索引 | 75.9–82.8% | 55.2–75.9% |
+| 难题 + masked | 72.4–82.8% | 55.2–72.4% |
+
+**教训**：doc R@5 是饱和指标；真正的区分度在 chunk@1/MRR。r2 rerank 稳定高性价比，r5 contextual 稳定靠前，
+r3 HyDE 在中文维基上会反噬，r8 agentic 的优势只在原题的多轮检索上出现。

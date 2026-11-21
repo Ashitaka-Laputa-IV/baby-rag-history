@@ -8,22 +8,25 @@ import time
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from babyrag.config import CHROMA_DIR, CHUNKS, ensure_dirs, load_settings
+from babyrag.config import CHROMA_DIR, ensure_dirs, load_settings, variant_paths
 from babyrag.llm import build_embeddings
 from babyrag.retrieval import read_jsonl
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--chunks", default=str(CHUNKS))
-    ap.add_argument("--collection", default="chunks")
+    ap.add_argument("--chunks", default=None)
+    ap.add_argument("--collection", default=None)
+    ap.add_argument("--variant", default="original", choices=["original", "masked"])
     ap.add_argument("--batch", type=int, default=128)
     ap.add_argument("--rebuild", action="store_true")
     args = ap.parse_args()
 
     ensure_dirs()
+    paths = variant_paths(args.variant)
     settings = load_settings()
-    rows = read_jsonl(__import__("pathlib").Path(args.chunks))
+    rows = read_jsonl(__import__("pathlib").Path(args.chunks or paths["chunks"]))
+    args.collection = args.collection or paths["dense"]
     print(f"chunks: {len(rows)}")
     embeddings = build_embeddings(settings)
     store = Chroma(collection_name=args.collection, embedding_function=embeddings,

@@ -20,8 +20,32 @@ CHUNKS = DATA / "chunks.jsonl"
 CONTEXTUAL = DATA / "contextual.jsonl"
 RAPTOR_NODES = DATA / "raptor.jsonl"
 QUERIES = EVAL / "queries.jsonl"
+QUERIES_HARD = EVAL / "queries-hard.jsonl"
 CHROMA_DIR = DATA / "chroma"
 BM25_DIR = DATA / "bm25"
+
+
+def variant_paths(variant: str) -> dict[str, Path]:
+    """Original (easy) vs masked (title-hidden, hard-negative) artifact paths."""
+    if variant == "masked":
+        return {
+            "corpus": DATA / "corpus.masked.jsonl",
+            "chunks": DATA / "chunks.masked.jsonl",
+            "contextual": DATA / "contextual.masked.jsonl",
+            "raptor": DATA / "raptor.masked.jsonl",
+            "dense": "chunks_masked",
+            "contextual_dense": "contextual_masked",
+            "raptor_dense": "raptor_masked",
+        }
+    return {
+        "corpus": CORPUS,
+        "chunks": CHUNKS,
+        "contextual": CONTEXTUAL,
+        "raptor": RAPTOR_NODES,
+        "dense": "chunks",
+        "contextual_dense": "contextual",
+        "raptor_dense": "raptor",
+    }
 
 DEFAULT_BASE_URL = "https://opencode.ai/inference/go/openai/v1"
 DEFAULT_MODEL = "deepseek-v4.1-flash"
@@ -37,6 +61,8 @@ MAX_CONTEXT_TOKENS = 4000
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 64
 ENCODING = "cl100k_base"
+DELIM = ["。", "！", "？", "；", "\n"]
+INCLUDE_DELIM = "prev"
 
 
 class ConfigError(RuntimeError):
@@ -52,6 +78,11 @@ class Settings:
     silicon_url: str = DEFAULT_SILICON_URL
     session_id: str = ""
     max_usd: float = 10.0
+    variant: str = "original"
+
+    @property
+    def paths(self) -> dict[str, Path]:
+        return variant_paths(self.variant)
 
 
 def load_settings(env: dict[str, str] | None = None) -> Settings:
@@ -69,6 +100,7 @@ def load_settings(env: dict[str, str] | None = None) -> Settings:
         silicon_url=(e.get("SILICONFLOW_BASE_URL") or DEFAULT_SILICON_URL).strip(),
         session_id=session,
         max_usd=float(e.get("BABYRAG_MAX_USD") or 10.0),
+        variant=(e.get("BABYRAG_VARIANT") or "original").strip(),
     )
 
 

@@ -15,8 +15,7 @@ from pathlib import Path
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from babyrag.config import (CHROMA_DIR, CHUNKS, CONTEXTUAL, CORPUS, ensure_dirs,
-                            load_settings)
+from babyrag.config import CHROMA_DIR, ensure_dirs, load_settings, variant_paths
 from babyrag.llm import LLMClient, build_embeddings
 from babyrag.prompts import CONTEXTUAL as CONTEXT_PROMPT
 from babyrag.retrieval import read_jsonl
@@ -30,10 +29,13 @@ def client() -> LLMClient:
     return _local.client
 
 
-def make_prefix(row: dict, doc_text: str) -> dict:
-    prompt = CONTEXT_PROMPT.format(title=row.get("title", ""),
+MASK = "（标题已隐藏）"
+
+
+def make_prefix(row: dict, doc_text: str, *, masked: bool = False) -> dict:
+    prompt = CONTEXT_PROMPT.format(title=MASK if masked else row.get("title", ""),
                                    doc=doc_text[:1800], chunk=row["text"])
-    result = client().invoke(prompt, stage="contextual",
+    result = client().invoke(prompt, stage=f"contextual{'-masked' if masked else ''}",
                              prompt_version="v1", system="你是中文维基百科的编辑。")
     prefix = result.text.strip().replace("\n", " ")
     return {
@@ -49,27 +51,32 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--variant", default="original", choices=["original", "masked"])
     ap.add_argument("--index", action="store_true", help="also build the Chroma collection")
     args = ap.parse_args()
 
     ensure_dirs()
     settings = load_settings()
-    rows = read_jsonl(CHUNKS)
-    docs = {d["doc_id"]: d["text"] for d in read_jsonl(CORPUS)}
+    paths = variant_paths(args.variant)
+    masked = args.variant == "masked"
+    rows = read_jsonl(paths["chunks"])
+    docs = {d["doc_id"]: d["text"] for d in read_jsonl(paths["corpus"])}
     if args.limit:
         rows = rows[: args.limit]
 
     existing: dict[str, dict] = {}
-    if CONTEXTUAL.exists():
-        existing = {r["chunk_id"]: r for r in read_jsonl(CONTEXTUAL)}
+    if paths["contextual"].exists():
+        existing = {r["chunk_id"]: r for r in read_jsonl(paths["contextual"])}
     todo = [r for r in rows if r["chunk_id"] not in existing]
     print(f"chunks={len(rows)} cached={len(existing)} todo={len(todo)}")
 
-    out = CONTEXTUAL.open("a", encoding="utf-8")
+    paths["contextual"].parent.mkdir(parents=True, exist_ok=True)
+    out = paths["contextual"].open("a", encoding="utf-8")
     done = 0
     try:
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
-            futures = {pool.submit(make_prefix, r, docs.get(r["doc_id"], "")): r for r in todo}
+            futures = {pool.submit(make_prefix, r, docs.get(r["doc_id"], ""),
+                                   masked=masked): r for r in todo}
             for future in as_completed(futures):
                 try:
                     row = future.result()
@@ -88,12 +95,13 @@ def main() -> int:
 
     if args.index:
         embeddings = build_embeddings(settings)
-        store = Chroma(collection_name="contextual", embedding_function=embeddings,
+        collection = paths["contextual_dense"]
+        store = Chroma(collection_name=collection, embedding_function=embeddings,
                        persist_directory=str(CHROMA_DIR),
                        collection_metadata={"hnsw:space": "cosine"})
         if store._collection.count():
             store.delete_collection()
-            store = Chroma(collection_name="contextual", embedding_function=embeddings,
+            store = Chroma(collection_name=collection, embedding_function=embeddings,
                            persist_directory=str(CHROMA_DIR),
                            collection_metadata={"hnsw:space": "cosine"})
         items = list(existing.values())

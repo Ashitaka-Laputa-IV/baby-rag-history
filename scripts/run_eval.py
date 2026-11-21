@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import os
+from pathlib import Path
 
-from babyrag.config import load_settings
+from babyrag.config import RESULTS, load_settings
 from babyrag.eval import evaluate, summarize, write_reports
 from babyrag.rungs import ALL_RUNGS
 
@@ -14,12 +16,31 @@ def main() -> int:
     ap.add_argument("--rungs", default="all")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--variant", default="original", choices=["original", "masked"])
+    ap.add_argument("--queries", default=None, help="path to a queries JSONL")
     args = ap.parse_args()
+    os.environ["BABYRAG_VARIANT"] = args.variant
     chosen = ALL_RUNGS if args.rungs == "all" else [r.strip() for r in args.rungs.split(",")]
+    queries_path = Path(args.queries) if args.queries else None
+    hard = queries_path is not None and "hard" in queries_path.name
+    run_name = None
+    if args.variant == "masked" or hard:
+        run_name = args.variant if not hard else (f"{args.variant}-hard" if args.variant == "masked" else "hard")
     settings = load_settings()
-    rows = evaluate(settings, rungs=chosen, limit=args.limit, workers=args.workers)
+    rows = evaluate(settings, rungs=chosen, limit=args.limit, workers=args.workers,
+                    queries_path=queries_path, run_name=run_name)
     summary = summarize(rows)
-    write_reports(rows, summary)
+    if hard:
+        label = "masked + hard questions" if args.variant == "masked" else "hard questions"
+        note = "29 道手写难题：避开文档标题，保留年份/地区/职业等限定词；每题 evidence 已校验落在 gold 文档内。"
+    elif args.variant == "masked":
+        label = "masked benchmark"
+        note = "30 道原题，chunk 标题替换为「（标题已隐藏）」，并加入 200 篇同姓/同类型干扰文档（1,200 篇 / 5,676 chunks）。"
+    else:
+        label = "leaderboard"
+        note = ""
+    write_reports(rows, summary, out_dir=RESULTS / run_name if run_name else RESULTS,
+                  run_label=label, dataset_note=note)
     return 0
 
 

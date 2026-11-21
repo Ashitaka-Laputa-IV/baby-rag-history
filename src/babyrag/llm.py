@@ -118,7 +118,8 @@ class LLMClient:
                 text = f"{type(exc).__name__}: {exc}"
                 retryable = any(s in text for s in ("429", "Rate limit", "rate_limit",
                                                     "500", "502", "503", "504", "timeout",
-                                                    "Timeout", "overloaded"))
+                                                    "Timeout", "overloaded",
+                                                    "Connection error", "Connection"))
                 last = exc
                 if not retryable or attempt == 4:
                     raise

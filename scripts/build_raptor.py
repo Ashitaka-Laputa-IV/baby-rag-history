@@ -17,7 +17,7 @@ import numpy as np
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from babyrag.config import CHROMA_DIR, CHUNKS, RAPTOR_NODES, ensure_dirs, load_settings
+from babyrag.config import CHROMA_DIR, ensure_dirs, load_settings, variant_paths
 from babyrag.llm import LLMClient, build_embeddings
 from babyrag.retrieval import read_jsonl
 
@@ -100,12 +100,14 @@ def main() -> int:
     ap.add_argument("--per-cluster", type=int, default=9)
     ap.add_argument("--levels", type=int, default=2)
     ap.add_argument("--workers", type=int, default=12)
+    ap.add_argument("--variant", default="original", choices=["original", "masked"])
     args = ap.parse_args()
 
     ensure_dirs()
     settings = load_settings()
+    paths = variant_paths(args.variant)
     embeddings_model = build_embeddings(settings)
-    chunks = read_jsonl(CHUNKS)
+    chunks = read_jsonl(paths["chunks"])
     print(f"leaves: {len(chunks)}")
 
     leaves = [{"node_id": c["chunk_id"], "doc_id": c["doc_id"],
@@ -124,17 +126,18 @@ def main() -> int:
                     "level": level} for n in nodes]
         current_vectors = embeddings_model.embed_documents([n["text"] for n in nodes])
 
-    with RAPTOR_NODES.open("w", encoding="utf-8", newline="\n") as handle:
+    with paths["raptor"].open("w", encoding="utf-8", newline="\n") as handle:
         for node in all_nodes:
             handle.write(json.dumps(node, ensure_ascii=False) + "\n")
-    print(f"wrote {RAPTOR_NODES} ({len(all_nodes)} summary nodes)")
+    print(f"wrote {paths['raptor']} ({len(all_nodes)} summary nodes)")
 
-    store = Chroma(collection_name="raptor", embedding_function=embeddings_model,
+    collection = paths["raptor_dense"]
+    store = Chroma(collection_name=collection, embedding_function=embeddings_model,
                    persist_directory=str(CHROMA_DIR),
                    collection_metadata={"hnsw:space": "cosine"})
     if store._collection.count():
         store.delete_collection()
-        store = Chroma(collection_name="raptor", embedding_function=embeddings_model,
+        store = Chroma(collection_name=collection, embedding_function=embeddings_model,
                        persist_directory=str(CHROMA_DIR),
                        collection_metadata={"hnsw:space": "cosine"})
     store.add_documents(

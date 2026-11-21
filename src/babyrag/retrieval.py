@@ -96,6 +96,7 @@ class Services:
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
+        self.paths = settings.paths
         self._dense: DenseRetriever | None = None
         self._contextual_dense: DenseRetriever | None = None
         self._raptor: DenseRetriever | None = None
@@ -108,32 +109,34 @@ class Services:
     @property
     def chunks(self) -> list[dict]:
         if self._chunks is None:
-            self._chunks = read_jsonl(CHUNKS)
+            self._chunks = read_jsonl(self.paths["chunks"])
         return self._chunks
 
     @property
     def contextual(self) -> dict[str, dict]:
         if self._contextual is None:
-            self._contextual = ({r["chunk_id"]: r for r in read_jsonl(CONTEXTUAL)}
-                                if CONTEXTUAL.exists() else {})
+            path = self.paths["contextual"]
+            self._contextual = ({r["chunk_id"]: r for r in read_jsonl(path)}
+                                if path.exists() else {})
         return self._contextual
 
     @property
     def dense(self) -> DenseRetriever:
         if self._dense is None:
-            self._dense = DenseRetriever(self.settings, "chunks")
+            self._dense = DenseRetriever(self.settings, self.paths["dense"])
         return self._dense
 
     @property
     def contextual_dense(self) -> DenseRetriever:
         if self._contextual_dense is None:
-            self._contextual_dense = DenseRetriever(self.settings, "contextual")
+            self._contextual_dense = DenseRetriever(
+                self.settings, self.paths["contextual_dense"])
         return self._contextual_dense
 
     @property
     def raptor(self) -> DenseRetriever:
         if self._raptor is None:
-            self._raptor = DenseRetriever(self.settings, "raptor")
+            self._raptor = DenseRetriever(self.settings, self.paths["raptor_dense"])
         return self._raptor
 
     @property

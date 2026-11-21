@@ -53,14 +53,15 @@ def judge(settings: Settings, question: str, gold: str, answer: str) -> int:
 
 
 def evaluate(settings: Settings, *, rungs: list[str] | None = None,
-             limit: int = 0, workers: int = 4) -> list[dict]:
+             limit: int = 0, workers: int = 4, queries_path: Path | None = None,
+             run_name: str | None = None) -> list[dict]:
     # Create the cache DB/table once, before worker threads race on it.
     from .cache import Cache
     from .config import CACHE_DB
 
     Cache(CACHE_DB).close()
     rungs = rungs or ALL_RUNGS
-    queries = read_queries()
+    queries = read_queries(queries_path or QUERIES)
     if limit:
         queries = queries[:limit]
     rows: list[dict] = []
@@ -106,7 +107,17 @@ def _score(settings: Settings, q: dict, result: dict) -> dict:
     out: dict = {}
     for k in (1, 3, 5, 10):
         out[f"doc_recall@{k}"] = int(any(gold_docs & ids for ids in doc_ids[:k])) if gold_docs else None
-    out["chunk_hit@5"] = int(any(evidence_in(h.get("text", ""), evidence) for h in hits[:5])) if evidence else None
+
+    doc_rank = next((i for i, ids in enumerate(doc_ids, start=1) if gold_docs & ids), None) if gold_docs else None
+    chunk_rank = next((i for i, h in enumerate(hits, start=1)
+                       if evidence_in(h.get("text", ""), evidence)), None) if evidence else None
+    out["doc@1"] = int(doc_rank == 1) if doc_rank else (0 if gold_docs else None)
+    out["chunk@1"] = int(chunk_rank == 1) if evidence else None
+    out["chunk@3"] = int(chunk_rank is not None and chunk_rank <= 3) if evidence else None
+    out["chunk@5"] = int(chunk_rank is not None and chunk_rank <= 5) if evidence else None
+    out["mrr@10"] = round(1.0 / chunk_rank, 4) if chunk_rank and chunk_rank <= 10 else (0.0 if evidence else None)
+    out["ndcg@10"] = round(1.0 / __import__("math").log2(chunk_rank + 1), 4) if chunk_rank and chunk_rank <= 10 else (0.0 if evidence else None)
+    out["chunk_hit@5"] = out["chunk@5"]
     out["citation_precision"] = (
         sum(1 for c in result.get("citations", []) if any(c == h.get("chunk_id") for h in hits)) /
         len(result.get("citations", [])) if result.get("citations") else None
@@ -142,12 +153,14 @@ def summarize(rows: list[dict]) -> dict:
             "correct": sum(correct),
             "correct_n": len(correct),
             "accuracy": round(sum(correct) / len(correct), 4) if correct else None,
-            "doc_recall@5": round(statistics.mean([r["doc_recall@5"] for r in items
-                                                   if r.get("doc_recall@5") is not None]), 4)
-            if any(r.get("doc_recall@5") is not None for r in items) else None,
-            "chunk_hit@5": round(statistics.mean([r["chunk_hit@5"] for r in items
-                                                  if r.get("chunk_hit@5") is not None]), 4)
-            if any(r.get("chunk_hit@5") is not None for r in items) else None,
+            "doc@1": _mean(items, "doc@1"),
+            "doc_recall@5": _mean(items, "doc_recall@5"),
+            "chunk@1": _mean(items, "chunk@1"),
+            "chunk@3": _mean(items, "chunk@3"),
+            "chunk@5": _mean(items, "chunk@5"),
+            "chunk_hit@5": _mean(items, "chunk@5"),
+            "mrr@10": _mean(items, "mrr@10"),
+            "ndcg@10": _mean(items, "ndcg@10"),
             "abstain_accuracy": _abstain_accuracy(items),
             "usd_total": round(sum(costs), 6),
             "usd_per_query": round(sum(costs) / len(items), 6) if items else 0,
@@ -168,6 +181,11 @@ def summarize(rows: list[dict]) -> dict:
     return out
 
 
+def _mean(items: list[dict], key: str) -> float | None:
+    values = [r[key] for r in items if r.get(key) is not None]
+    return round(statistics.mean(values), 4) if values else None
+
+
 def _abstain_accuracy(items: list[dict]) -> float | None:
     if not items or items[0].get("rung") not in {"r7_crag", "r8_agentic", "adaptive"}:
         return None
@@ -177,7 +195,8 @@ def _abstain_accuracy(items: list[dict]) -> float | None:
     return round(sum(int(r.get("abstain", False)) for r in subset) / len(subset), 4)
 
 
-def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS) -> None:
+def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
+                  run_label: str = "leaderboard", dataset_note: str = "") -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     with (out_dir / "per_query.jsonl").open("w", encoding="utf-8", newline="\n") as handle:
         for row in rows:
@@ -188,10 +207,10 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS) -
     (out_dir / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    lines = ["# baby-rag-history · leaderboard", "",
+    lines = [f"# baby-rag-history · {run_label}", "",
              "同一语料、同一批问题；`N/A` 表示该档不具备该能力，不是 0 分。", "",
-             "| rung | 里程碑 | acc | doc R@5 | chunk hit@5 | abstain | cold $/q | 本次实付 | p50 | p95 |",
-             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+             "| rung | 里程碑 | acc | doc@1 | chunk@1 | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | abstain | cold $/q | p50 | p95 |",
+             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for rung, s in summary.items():
         def fmt(v, pct=False):
             if v is None:
@@ -199,14 +218,16 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS) -
             return f"{v * 100:.1f}%" if pct else str(v)
         lines.append(
             f"| `{rung}` | {LABELS.get(rung, rung)} | {fmt(s['accuracy'], True)} | "
-            f"{fmt(s['doc_recall@5'], True)} | {fmt(s['chunk_hit@5'], True)} | "
+            f"{fmt(s['doc@1'], True)} | {fmt(s['chunk@1'], True)} | {fmt(s['chunk@3'], True)} | "
+            f"{fmt(s['chunk@5'], True)} | {fmt(s['mrr@10'])} | {fmt(s['ndcg@10'])} | "
             f"{fmt(s['abstain_accuracy'], True)} | ${s['usd_cold_per_query']:.5f} | "
-            f"${s['usd_total']:.3f} | {s['p50_ms']}ms | {s['p95_ms']}ms |")
+            f"{s['p50_ms']}ms | {s['p95_ms']}ms |")
+    note = dataset_note or ("评测集 30 题（single 12 / entity 6 / multi 6 / global 3 / none 3）；"
+                            "1,000 篇 / 4,740 chunks。")
     lines += ["", "## 说明", "",
-              "- 评测集 30 题（single 12 / entity 6 / multi 6 / global 3 / none 3）。",
-              "- global 与 none 各 3 题，只适合演示方向，不能下统计结论。",
+              f"- {note}",
               "- `cold $/q` 按本次记录的 token × 单价计算，不受缓存影响；`本次实付` 是实际账单。",
-              "- 语料 1,000 篇 / 4,740 chunks；top-5 的 doc 召回已接近饱和，差异主要来自 chunk 级排序。",
+              "- `chunk@1` / `MRR@10` 是主指标；`doc R@5` 在原始语料上会饱和。",
               "- 成本逐条见 `results/cost.jsonl`。"]
     (out_dir / "leaderboard.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote {out_dir / 'leaderboard.md'}")
