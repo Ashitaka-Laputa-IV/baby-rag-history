@@ -46,6 +46,9 @@
 **对照**：去标题后 `evidence R@1` 从 48–85% 掉到 30–59%，`可答 acc` 从 89–100% 掉到 67–78%。
 原题的高分有相当一部分来自标题泄漏。
 
+> 注意：masked 只去掉 chunk 文本与问题里的标题；`build_context` 仍会把 metadata 的 `title`
+> 拼进上下文，所以是**部分去偏**，不是完全去标题。
+
 ## 3. 公平难题 25（原索引）
 
 | rung | 可答 acc | evidence R@1 | evidence R@5 | MRR@10 | 综合 |

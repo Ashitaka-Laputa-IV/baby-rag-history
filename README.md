@@ -5,6 +5,7 @@
 同一份语料、同一批问题、同一个 4,000-token 上下文预算；每个 rung 只改检索链路的一个变量，
 并同时记录效果、召回、弃答、延迟和成本。
 
+> 读源码：[`learn/README.md`](learn/README.md) ·
 > 文档索引：[`docs/README.md`](docs/README.md) ·
 > 架构：[`docs/design.md`](docs/design.md) ·
 > 完整结果：[`docs/results.md`](docs/results.md) ·
@@ -69,6 +70,22 @@ uv run python -m scripts.build_index --variant masked --rebuild
 uv run babyrag ask "增禄的父亲咸成曾任什么官职？" --rung r2_rerank
 uv run python -m scripts.run_eval --rungs all --workers 3
 ```
+
+## 读源码
+
+从 [`learn/README.md`](learn/README.md) 开始。它按调用链分成 8 篇：
+
+| 篇 | 内容 |
+|---|---|
+| [一次请求的生命周期](learn/01-request-lifecycle.md) | `ask` 从 CLI 到答案的完整状态流 |
+| [配置与类型](learn/02-config-types.md) | 路径、价格、`RAGState`、reducer |
+| [模型与缓存](learn/03-llm-cache.md) | OpenCode Go session、计费、SQLite 缓存 |
+| [检索层](learn/04-retrieval.md) | dense、BM25、RRF、rerank、上下文拼装 |
+| [Rung 计划表](learn/05-rungs.md) | 九个里程碑如何变成一行计划 |
+| [Graph 节点](learn/06-graph.md) | plan/dispatch、grade、agentic、generate |
+| [评测](learn/07-evaluation.md) | 分母、evidence recall、Wilson、综合分 |
+| [CLI 与脚本](learn/08-cli-scripts.md) | 数据/索引管线和命令入口 |
+| [综合练习](learn/09-capstone.md) | 加 rung、改 top-k、加指标、修 masked 泄漏 |
 
 ## 数据
 
@@ -141,7 +158,7 @@ research/           # 实现前研究（有过期假设）
 
 - 原题 30 道，global 和 no-answer 各只有 3 道；10 道 test split 是回顾性的，不是真 holdout。
 - 难题集是 25 道单跳改写题，没有覆盖多跳/全局。
-- masked 的 contextual 前缀是从原前缀派生的近似，没有重新跑 5,676 次 LLM。
+- masked 的 contextual 前缀是从原前缀派生的近似，没有重新跑 5,676 次 LLM；而且只去掉了 chunk 文本里的标题，metadata 的 `title` 仍会拼进上下文，属于**部分去偏**。
 - faithfulness 只有 30 条抽样、单 judge，区分度低。
 - 公开锚点只有 RAGBench `emanual` 的 25 题英文手册，不是中文语料的外部验证。
 - 这是机制/成本/失败模式演示，不是论文复现：DPR 训练、Self-RAG reflection token、

@@ -4,6 +4,7 @@
 
 | 文档 | 内容 | 适合谁 |
 |---|---|---|
+| [`../learn/README.md`](../learn/README.md) | 按调用链读源码的 8 篇教程 | 要读/改代码的人 |
 | [`../README.md`](../README.md) | 项目是什么、怎么跑、核心结论 | 第一次看的人 |
 | [`design.md`](design.md) | 架构、rung 设计、数据管线、关键决策 | 要改代码的人 |
 | [`results.md`](results.md) | 六套评测的完整结果与解读 | 要看数字的人 |
