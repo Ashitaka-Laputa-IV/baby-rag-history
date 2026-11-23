@@ -1,0 +1,349 @@
+{
+  "sampled_answers": 30,
+  "by_rung": {
+    "adaptive": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r0_dense": {
+      "n": 3,
+      "supported_n": 2,
+      "supported": 2.0,
+      "citation_n": 2,
+      "citation_ok": 2,
+      "unsupported": 1,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r1_hybrid": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r2_rerank": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r3_hyde": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r4_multiquery": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r5_contextual": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r6_raptor": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r7_crag": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    },
+    "r8_agentic": {
+      "n": 3,
+      "supported_n": 3,
+      "supported": 3.0,
+      "citation_n": 3,
+      "citation_ok": 3,
+      "unsupported": 0,
+      "supported_avg": 1.0,
+      "citation_ok_rate": 1.0
+    }
+  },
+  "items": [
+    {
+      "qid": "q014",
+      "rung": "adaptive",
+      "answer": "陈小云于1985年灌录其首张专辑《舞女》[1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q008",
+      "rung": "adaptive",
+      "answer": "广州地铁三号线B1型列车的最高营运时速为 **120 km/h**。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q003",
+      "rung": "adaptive",
+      "answer": "云岭东支的最高点位于玉龙雪山，即玉龙雪山主峰，海拔5596米。[3]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q023",
+      "rung": "r0_dense",
+      "answer": "机·丹尼尔·奥利瓦更多。资料明确机·丹尼尔·奥利瓦在机器人系列的“四篇长篇小说”中登场 [1]；而苏珊·凯文以她为主角的是“短篇小说有十一部” [2]，资料列出的登场小说也多为短篇，且提到《曙光中的机器人》时称其为“中篇小说”并只是作为传奇被提及 [3]。因此，依据给定资料，机·丹尼尔·奥利瓦登场的长篇小说更多。[1][2][3]",
+      "supported": null,
+      "citation_ok": null,
+      "unsupported": [
+        "<bad json>"
+      ]
+    },
+    {
+      "qid": "q005",
+      "rung": "r0_dense",
+      "answer": "2019年区议会选举中，司马文击败的民建联候选人是萧炜忠 [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q006",
+      "rung": "r0_dense",
+      "answer": "开姆尼茨工业大学的前身创办于 **1836年**。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q019",
+      "rung": "r1_hybrid",
+      "answer": "1916年，叶举在岑春煊担任都司令的**两广护国军都司令部**（亦称“两广都司令部”）中出任参谋长 [1][2][3]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q006",
+      "rung": "r1_hybrid",
+      "answer": "1836年。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q013",
+      "rung": "r1_hybrid",
+      "answer": "郑效峰是在1955年被授予少将军衔的。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q020",
+      "rung": "r2_rerank",
+      "answer": "弗雷旺的市镇面积为15.23平方公里 [1]，埃丹的市镇面积为0.93平方公里 [2]。因此，弗雷旺的市镇面积比埃丹大14.30平方公里 [1][2]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q004",
+      "rung": "r2_rerank",
+      "answer": "1958年12月20日，平凉县并入平凉市。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q017",
+      "rung": "r2_rerank",
+      "answer": "是贾充命令成济刺杀曹髦的。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q008",
+      "rung": "r3_hyde",
+      "answer": "广州地铁三号线B1型列车的营运时速为120 km/h [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q005",
+      "rung": "r3_hyde",
+      "answer": "司马文在2019年区议会选举中击败了民建联的萧炜忠。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q002",
+      "rung": "r3_hyde",
+      "answer": "李崇禧受贿案一审由江西省南昌市中级人民法院宣判。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q014",
+      "rung": "r4_multiquery",
+      "answer": "1985年 [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q004",
+      "rung": "r4_multiquery",
+      "answer": "平凉县并入了平凉市 [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q008",
+      "rung": "r4_multiquery",
+      "answer": "广州地铁三号线B1型列车的最高营运时速是 **120 km/h**。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q001",
+      "rung": "r5_contextual",
+      "answer": "增禄的父亲咸成曾任“福建泉州府厦门海防同知” [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q018",
+      "rung": "r5_contextual",
+      "answer": "卡加利牛仔节现时的入场人数记录为 **1,262,518 人次**（2006年）[1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q015",
+      "rung": "r5_contextual",
+      "answer": "弗雷旺的市镇面积为15.23平方公里。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q002",
+      "rung": "r6_raptor",
+      "answer": "李崇禧受贿案一审由江西省南昌市中级人民法院（南昌中院）宣判。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q020",
+      "rung": "r6_raptor",
+      "answer": "弗雷旺的市镇面积为15.23平方公里 [1]，埃丹的市镇面积为0.93平方公里 [2]。因此，弗雷旺的市镇面积比埃丹大14.30平方公里 [1][2]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q006",
+      "rung": "r6_raptor",
+      "answer": "开姆尼茨工业大学的前身创办于 **1836年**。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q010",
+      "rung": "r7_crag",
+      "answer": "晋武帝太康三年，安成郡有3000户。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q024",
+      "rung": "r7_crag",
+      "answer": "《她来自未来》改编自小说而非连环漫画，其根据基尔·布雷切夫的小说《一百年以后》改编 [2]；《特警判官》则是根据同名连环漫画改编 [1]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q021",
+      "rung": "r7_crag",
+      "answer": "PA md. 86 至今仍是罗马尼亚军队的制式步枪 [1][2]；PM md. 63 曾为罗马尼亚军队的制式步枪 [3]。",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q005",
+      "rung": "r8_agentic",
+      "answer": "司马文在2019年区议会选举中击败的民建联候选人是萧炜忠。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q022",
+      "rung": "r8_agentic",
+      "answer": "该宪法起草机构是国宪起草委员会，其委员长为林长民。[2]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    },
+    {
+      "qid": "q013",
+      "rung": "r8_agentic",
+      "answer": "郑效峰是在1955年被授予少将军衔的。[1]",
+      "supported": 1.0,
+      "citation_ok": true,
+      "unsupported": []
+    }
+  ]
+}

@@ -191,6 +191,14 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 **真正稳定的结论**：`r2 rerank` 是低成本高收益；`r5 contextual` 在排序指标上稳定靠前；`r3 HyDE` 在这份中文维基语料上经常**反噬**（假答案把正确 chunk 挤掉）；`r8 agentic` 的可答 acc 并不领先，evidence R@1 偏低——多轮检索没有改善首轮命中。
 
+### Faithfulness / citation support
+
+抽了 30 条非弃答答案（每个 rung 最多 3 条），用严格 judge 判断「回答中的事实是否被编号资料支持」：
+
+- **29/30 条 `supported=1.0`**，`citation_ok` 全部为真；1 条因 judge 返回非 JSON 被排除。
+- 这个指标区分度不高：样本小、judge 偏宽松，且答案大多直接抄上下文。它更适合发现「编造型」失败，而不是给 rung 排名。
+- 完整结果：`results/faithfulness.md`。
+
 ### 协议 v2 的额外检查
 
 - **分母统一**：`可答 acc` 只算可回答问题（27 / 25 道），`弃答 acc` 只算 no-answer 题；所有 rung 同一分母。
@@ -208,6 +216,21 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 完整表：`results/test/leaderboard.md`。**注意**：这 10 道题在开发期已经见过，它不是真正的 holdout；r5 的 9/9 全对在 n=10 下区间仍有 [70–100]。
 
+### 外部锚点：RAGBench emanual（25 题，英文）
+
+从 `galileo-ai/ragbench` 的 `emanual` test split 取 25 题，54 篇文档、54 个 chunk。只跑 6 个代表 rung（r5/r6 没有公共索引）：
+
+| rung | 可答 acc | evidence R@1 | MRR@10 | 综合 |
+|---|---:|---:|---:|---:|
+| `r2_rerank` | **60.0%** | 78.6% | 0.893 | **67.6** |
+| `r7_crag` | **60.0%** | **85.7%** | 0.893 | **67.6** |
+| `r1_hybrid` | 56.0% | 57.1% | 0.720 | 56.8 |
+| `r0_dense` | 52.0% | 57.1% | 0.750 | 55.6 |
+| `r8_agentic` | 56.0% | 57.1% | 0.720 | 54.3 |
+| `r4_multiquery` | 44.0% | 64.3% | 0.821 | 54.0 |
+
+**外部结论**：`r2 rerank` 仍然最强，和中文主榜一致；`r4 multi-query` 在英文手册上反而掉到 44%，说明「查询改写」的收益高度依赖语料和题型。完整表：`results/public/leaderboard.md`。
+
 ## 诚实的限制
 
 - 首版评测集是 **30 题**（single 12 / entity 6 / multi 6 / global 3 / none 3）。global 与 none 各 3 题，
@@ -219,7 +242,8 @@ uv run python -m scripts.run_eval --rungs all --workers 4
   要测出检索层的差异，需要更大的语料或去标题线索的难题集。
 - **test split 是回顾性的**：10 道题在开发期已经见过，只能作为稳健性检查，不是真正的 holdout。
 - **judge 校准不是人工标注**：30 条答案 / 15 个唯一问题，A/B 字段对调 30/30 一致，但没有第二模型或人工复核。
-- **还没有公开集子集**：CRAG / RGB / MultiHop-RAG 的外部锚点尚未接入；当前结论只在这份 1,000 篇中文维基语料上成立。
+- **公开集锚点很小**：只有 RAGBench `emanual` 的 25 题英文手册，且只跑了 6 个 rung；它不是中文语料的外部验证。
+- **faithfulness 区分度低**：30 条抽样里 29 条 `supported=1.0`，judge 偏宽松，不能用来给 rung 排名。
 - 本项目演示的是**机制、成本与失败模式**，不是论文复现：DPR 训练、Self-RAG 的 reflection token、
   CRAG 的网页回退都换成了同机制的 LLM/规则替代。
 - `N/A` 表示该档不具备该能力，不是 0 分。

@@ -17,7 +17,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--chunks", default=None)
     ap.add_argument("--collection", default=None)
-    ap.add_argument("--variant", default="original", choices=["original", "masked"])
+    ap.add_argument("--variant", default="original", choices=["original", "masked", "public"])
     ap.add_argument("--batch", type=int, default=128)
     ap.add_argument("--rebuild", action="store_true")
     args = ap.parse_args()

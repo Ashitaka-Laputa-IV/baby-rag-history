@@ -76,6 +76,23 @@ JUDGE_SWAP = """你是严格的评测员。判断【回答】是否与【参考�
 参考答案：{gold}
 """
 
+FAITHFULNESS = """你是严格的 RAG 评测员。判断【回答】中的事实性陈述是否被【引用资料】支持。
+
+只输出 JSON：
+{{"supported": 0.0, "citation_ok": true, "unsupported": ["不被支持的陈述"]}}
+
+- supported：被资料支持的事实比例，0 到 1。
+- citation_ok：回答里 [编号] 引用是否真的指向支持该句的资料。
+- unsupported：列出不被资料支持的 claim；没有就空数组。
+- 不要因为资料之外的世界知识而判支持；只看给定资料。
+
+问题：{question}
+回答：{answer}
+
+引用资料：
+{context}
+"""
+
 
 def parse_relevant(text: str, n: int) -> tuple[list[int], str]:
     match = re.search(r"\{.*?\}", text, re.S)

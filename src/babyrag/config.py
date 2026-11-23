@@ -27,6 +27,17 @@ BM25_DIR = DATA / "bm25"
 
 def variant_paths(variant: str) -> dict[str, Path]:
     """Original (easy) vs masked (title-hidden, hard-negative) artifact paths."""
+    if variant == "public":
+        base = DATA / "public"
+        return {
+            "corpus": base / "corpus.jsonl",
+            "chunks": base / "chunks.jsonl",
+            "contextual": base / "contextual.jsonl",
+            "raptor": base / "raptor.jsonl",
+            "dense": "chunks_public",
+            "contextual_dense": "contextual_public",
+            "raptor_dense": "raptor_public",
+        }
     if variant == "masked":
         return {
             "corpus": DATA / "corpus.masked.jsonl",

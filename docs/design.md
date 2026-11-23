@@ -435,6 +435,13 @@ r3 HyDE 在中文维基上会反噬，r8 agentic 的优势只在原题的多轮�
 权重是 50/30/20，成本项只做温和惩罚，避免贵 3 倍的档在平手时胜出。结果：r5 contextual 赢 3/4 套，
 r4 multi-query 赢「难题 + masked」，r2 rerank 稳定前三；r3 HyDE 与 r8 agentic 综合分偏低。
 
+**外部锚点**：RAGBench `emanual` test 取 25 题（英文手册，54 文档 / 54 chunks），跑 r0/r1/r2/r4/r7/r8。
+r2 rerank 与 r7 CRAG 综合分 67.6 并列最高；r4 multi-query 只有 44%，说明查询改写的收益依赖语料。
+完整表 `results/public/leaderboard.md`。
+
+**Faithfulness**：抽 30 条非弃答答案，29 条 `supported=1.0`、citation 全通过；judge 偏宽松，区分度低。
+完整结果 `results/faithfulness.md`。
+
 **评测协议 v2**：`可答 acc` 与 `弃答 acc` 分母分离（所有 rung 同一可答分母 27/25）；
 比例指标报 Wilson 95% CI（bootstrap 仍在 `summary.json`）；judge 做 30 条 A/B 字段对调校准（30/30 一致，
 15 个唯一问题，仍非人工标注）；20 道 dev / 10 道回顾性 test split，test 结果单独放 `results/test/`。

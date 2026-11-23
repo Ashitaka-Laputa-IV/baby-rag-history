@@ -21,6 +21,7 @@ dependencies = [
     "python-dotenv>=1.0",
     "typer>=0.15",
     "rich>=13.0",
+    "datasets>=5.2.0",
 ]
 
 [project.scripts]

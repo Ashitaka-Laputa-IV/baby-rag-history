@@ -16,7 +16,7 @@ def main() -> int:
     ap.add_argument("--rungs", default="all")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=4)
-    ap.add_argument("--variant", default="original", choices=["original", "masked"])
+    ap.add_argument("--variant", default="original", choices=["original", "masked", "public"])
     ap.add_argument("--queries", default=None, help="path to a queries JSONL")
     args = ap.parse_args()
     os.environ["BABYRAG_VARIANT"] = args.variant
@@ -25,7 +25,7 @@ def main() -> int:
     hard = queries_path is not None and "hard" in queries_path.name
     test = queries_path is not None and "test" in queries_path.name
     run_name = None
-    if args.variant == "masked" or hard or test:
+    if args.variant == "masked" or args.variant == "public" or hard or test:
         if test:
             run_name = "test"
         elif hard:
@@ -39,6 +39,9 @@ def main() -> int:
     if test:
         label = "retrospective test split"
         note = "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。"
+    elif args.variant == "public":
+        label = "RAGBench external anchor"
+        note = "RAGBench emanual test 子集（40 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。"
     elif hard:
         label = "masked + hard questions" if args.variant == "masked" else "hard questions"
         note = "29 道手写难题：避开文档标题，保留年份/地区/职业等限定词；每题 evidence 已校验落在 gold 文档内。"
