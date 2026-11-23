@@ -21,7 +21,10 @@
     "p95_ms": 4585,
     "tokens_in": 41216,
     "tokens_out": 4100,
-    "llm_calls": 22
+    "llm_calls": 22,
+    "quality": 0.7989,
+    "cost_factor": 0.9666,
+    "composite": 77.2
   },
   "r1_hybrid": {
     "n": 25,
@@ -45,7 +48,10 @@
     "p95_ms": 46647,
     "tokens_in": 40574,
     "tokens_out": 4257,
-    "llm_calls": 21
+    "llm_calls": 21,
+    "quality": 0.7987,
+    "cost_factor": 0.9666,
+    "composite": 77.2
   },
   "r2_rerank": {
     "n": 25,
@@ -69,7 +75,10 @@
     "p95_ms": 39400,
     "tokens_in": 41051,
     "tokens_out": 4578,
-    "llm_calls": 21
+    "llm_calls": 21,
+    "quality": 0.8627,
+    "cost_factor": 0.9656,
+    "composite": 83.3
   },
   "r3_hyde": {
     "n": 25,
@@ -93,7 +102,10 @@
     "p95_ms": 34937,
     "tokens_in": 43041,
     "tokens_out": 28700,
-    "llm_calls": 7
+    "llm_calls": 7,
+    "quality": 0.804,
+    "cost_factor": 0.9135,
+    "composite": 73.4
   },
   "r4_multiquery": {
     "n": 25,
@@ -117,7 +129,10 @@
     "p95_ms": 34718,
     "tokens_in": 43963,
     "tokens_out": 11962,
-    "llm_calls": 18
+    "llm_calls": 18,
+    "quality": 0.888,
+    "cost_factor": 0.9478,
+    "composite": 84.2
   },
   "r5_contextual": {
     "n": 25,
@@ -141,7 +156,10 @@
     "p95_ms": 30661,
     "tokens_in": 41432,
     "tokens_out": 3809,
-    "llm_calls": 25
+    "llm_calls": 25,
+    "quality": 0.8627,
+    "cost_factor": 0.9671,
+    "composite": 83.4
   },
   "r6_raptor": {
     "n": 25,
@@ -165,7 +183,10 @@
     "p95_ms": 4009,
     "tokens_in": 40702,
     "tokens_out": 4504,
-    "llm_calls": 8
+    "llm_calls": 8,
+    "quality": 0.8627,
+    "cost_factor": 0.966,
+    "composite": 83.3
   },
   "r7_crag": {
     "n": 25,
@@ -189,7 +210,10 @@
     "p95_ms": 43992,
     "tokens_in": 63353,
     "tokens_out": 18607,
-    "llm_calls": 27
+    "llm_calls": 27,
+    "quality": 0.8627,
+    "cost_factor": 0.9236,
+    "composite": 79.7
   },
   "r8_agentic": {
     "n": 25,
@@ -213,7 +237,10 @@
     "p95_ms": 35193,
     "tokens_in": 58567,
     "tokens_out": 31958,
-    "llm_calls": 23
+    "llm_calls": 23,
+    "quality": 0.7987,
+    "cost_factor": 0.8994,
+    "composite": 71.8
   },
   "adaptive": {
     "n": 25,
@@ -237,6 +264,9 @@
     "p95_ms": 25541,
     "tokens_in": 40574,
     "tokens_out": 4257,
-    "llm_calls": 0
+    "llm_calls": 0,
+    "quality": 0.7987,
+    "cost_factor": 0.9666,
+    "composite": 77.2
   }
 }

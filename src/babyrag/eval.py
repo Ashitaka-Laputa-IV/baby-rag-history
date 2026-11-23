@@ -178,6 +178,16 @@ def summarize(rows: list[dict]) -> dict:
             "tokens_out": sum(int(r.get("cost", {}).get("tokens_out", 0)) for r in items),
             "llm_calls": sum(int(r.get("cost", {}).get("llm_calls", 0)) for r in items),
         }
+        entry = out[rung]
+        # Composite: 50% answer accuracy, 30% first-hit retrieval, 20% ranking,
+        # with a mild cost penalty so a 3x-expensive rung cannot win a tie.
+        quality = (0.50 * (entry["accuracy"] or 0.0)
+                   + 0.30 * (entry["chunk@1"] or 0.0)
+                   + 0.20 * (entry["mrr@10"] or 0.0))
+        factor = 1.0 / (1.0 + 100.0 * (entry["usd_cold_per_query"] or 0.0))
+        entry["quality"] = round(quality, 4)
+        entry["cost_factor"] = round(factor, 4)
+        entry["composite"] = round(100.0 * quality * factor, 1)
     return out
 
 
@@ -209,15 +219,16 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
 
     lines = [f"# baby-rag-history · {run_label}", "",
              "同一语料、同一批问题；`N/A` 表示该档不具备该能力，不是 0 分。", "",
-             "| rung | 里程碑 | acc | doc@1 | chunk@1 | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | abstain | cold $/q | p50 | p95 |",
-             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+             "| rung | 里程碑 | 综合 | acc | doc@1 | chunk@1 | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | abstain | cold $/q | p50 | p95 |",
+             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for rung, s in summary.items():
         def fmt(v, pct=False):
             if v is None:
                 return "N/A"
             return f"{v * 100:.1f}%" if pct else str(v)
         lines.append(
-            f"| `{rung}` | {LABELS.get(rung, rung)} | {fmt(s['accuracy'], True)} | "
+            f"| `{rung}` | {LABELS.get(rung, rung)} | **{s.get('composite', 0):.1f}** | "
+            f"{fmt(s['accuracy'], True)} | "
             f"{fmt(s['doc@1'], True)} | {fmt(s['chunk@1'], True)} | {fmt(s['chunk@3'], True)} | "
             f"{fmt(s['chunk@5'], True)} | {fmt(s['mrr@10'])} | {fmt(s['ndcg@10'])} | "
             f"{fmt(s['abstain_accuracy'], True)} | ${s['usd_cold_per_query']:.5f} | "
@@ -227,6 +238,7 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
     lines += ["", "## 说明", "",
               f"- {note}",
               "- `cold $/q` 按本次记录的 token × 单价计算，不受缓存影响；`本次实付` 是实际账单。",
+              "- 综合分 = 100 × (0.50×acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。",
               "- `chunk@1` / `MRR@10` 是主指标；`doc R@5` 在原始语料上会饱和。",
               "- 成本逐条见 `results/cost.jsonl`。"]
     (out_dir / "leaderboard.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
