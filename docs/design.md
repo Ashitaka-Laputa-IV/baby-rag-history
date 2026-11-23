@@ -431,7 +431,7 @@ GraphRAG 的排除不影响上述结论（RAPTOR 已覆盖全局题）。`doc re
 **教训**：doc R@5 是饱和指标；真正的区分度在 chunk@1/MRR。r2 rerank 稳定高性价比，r5 contextual 稳定靠前，
 r3 HyDE 在中文维基上会反噬，r8 agentic 的优势只在原题的多轮检索上出现。
 
-**综合分**：`100 × (0.50×可答 acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`。
+**综合分**：`100 × (0.50×可答 acc + 0.30×evidence R@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`。
 权重是 50/30/20，成本项只做温和惩罚，避免贵 3 倍的档在平手时胜出。结果：r5 contextual 赢 3/4 套，
 r4 multi-query 赢「难题 + masked」，r2 rerank 稳定前三；r3 HyDE 与 r8 agentic 综合分偏低。
 

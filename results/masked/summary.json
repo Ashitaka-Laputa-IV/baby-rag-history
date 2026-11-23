@@ -15,6 +15,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.8148,
+    "doc_recall_all@5": 0.7407,
+    "context_precision@5": 0.1259,
     "chunk@1": 0.4444,
     "chunk@1_ci": [
       0.2593,
@@ -67,6 +69,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.9259,
+    "doc_recall_all@5": 0.7778,
+    "context_precision@5": 0.1556,
     "chunk@1": 0.4444,
     "chunk@1_ci": [
       0.2593,
@@ -119,6 +123,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.8519,
+    "doc_recall_all@5": 0.7778,
+    "context_precision@5": 0.1481,
     "chunk@1": 0.5556,
     "chunk@1_ci": [
       0.3704,
@@ -171,6 +177,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.8889,
+    "doc_recall_all@5": 0.8519,
+    "context_precision@5": 0.1556,
     "chunk@1": 0.2963,
     "chunk@1_ci": [
       0.1481,
@@ -223,6 +231,8 @@
     ],
     "doc@1": 0.8519,
     "doc_recall@5": 0.8519,
+    "doc_recall_all@5": 0.7778,
+    "context_precision@5": 0.1481,
     "chunk@1": 0.5556,
     "chunk@1_ci": [
       0.3333,
@@ -275,6 +285,8 @@
     ],
     "doc@1": 0.8519,
     "doc_recall@5": 0.8889,
+    "doc_recall_all@5": 0.8148,
+    "context_precision@5": 0.1556,
     "chunk@1": 0.5926,
     "chunk@1_ci": [
       0.4074,
@@ -327,6 +339,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.8889,
+    "doc_recall_all@5": 0.7407,
+    "context_precision@5": 0.1259,
     "chunk@1": 0.5556,
     "chunk@1_ci": [
       0.3704,
@@ -379,6 +393,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.8519,
+    "doc_recall_all@5": 0.7407,
+    "context_precision@5": 0.4667,
     "chunk@1": 0.5556,
     "chunk@1_ci": [
       0.3704,
@@ -431,6 +447,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.9259,
+    "doc_recall_all@5": 0.7778,
+    "context_precision@5": 0.1556,
     "chunk@1": 0.4444,
     "chunk@1_ci": [
       0.2593,
@@ -483,6 +501,8 @@
     ],
     "doc@1": 0.8148,
     "doc_recall@5": 0.9259,
+    "doc_recall_all@5": 0.8148,
+    "context_precision@5": 0.1556,
     "chunk@1": 0.4444,
     "chunk@1_ci": [
       0.2593,

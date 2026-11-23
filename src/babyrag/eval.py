@@ -134,6 +134,15 @@ def _score(settings: Settings, q: dict, result: dict) -> dict:
 
     chunk_rank = next((i for i, h in enumerate(hits, start=1) if relevant(h)), None) if evidence else None
     out["doc@1"] = int(doc_rank == 1) if doc_rank else (0 if gold_docs else None)
+    top_docs = set()
+    for h in hits[:5]:
+        top_docs.update(h.get("doc_ids") or [h.get("doc_id", "")])
+    out["doc_recall_all@5"] = (int(bool(gold_docs) and gold_docs.issubset(top_docs))
+                               if gold_docs else None)
+    out["context_precision@5"] = (
+        round(sum(1 for h in hits[:5] if relevant(h)) / len(hits[:5]), 4)
+        if hits and evidence else None
+    )
     out["chunk@1"] = int(chunk_rank == 1) if evidence else None
     out["chunk@3"] = int(chunk_rank is not None and chunk_rank <= 3) if evidence else None
     out["chunk@5"] = int(chunk_rank is not None and chunk_rank <= 5) if evidence else None
@@ -184,6 +193,8 @@ def summarize(rows: list[dict]) -> dict:
             "accuracy_ci_wilson": _wilson_ci([float(x) for x in correct]),
             "doc@1": _mean(items, "doc@1"),
             "doc_recall@5": _mean(items, "doc_recall@5"),
+            "doc_recall_all@5": _mean(items, "doc_recall_all@5"),
+            "context_precision@5": _mean(items, "context_precision@5"),
             "chunk@1": _mean(items, "chunk@1"),
             "chunk@1_ci": _bootstrap_ci([float(r["chunk@1"]) for r in items
                                          if r.get("chunk@1") is not None]),
@@ -275,8 +286,8 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
 
     lines = [f"# baby-rag-history · {run_label}", "",
              "同一语料、同一批问题；`N/A` 表示该档不具备该能力，不是 0 分。", "",
-             "| rung | 里程碑 | 综合 | 可答 acc (95% CI) | 弃答 acc (95% CI) | doc@1 | chunk@1 (95% CI) | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | cold $/q | p50 | p95 |",
-             "|---|---|---:|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
+             "| rung | 里程碑 | 综合 | 可答 acc (95% CI) | 弃答 acc (95% CI) | doc@1 | doc all@5 | evidence R@1 (95% CI) | R@3 | R@5 | MRR@10 | nDCG@10 | cold $/q | p50 | p95 |",
+             "|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
     for rung, s in summary.items():
         def fmt(v, pct=False):
             if v is None:
@@ -295,9 +306,10 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
             f"| `{rung}` | {LABELS.get(rung, rung)} | **{s.get('composite', 0):.1f}** | "
             f"{with_ci(s['accuracy'], s.get('accuracy_ci_wilson'), True)} | "
             f"{with_ci(s['abstain_accuracy'], s.get('abstain_ci_wilson'), True)} | "
-            f"{fmt(s['doc@1'], True)} | {with_ci(s['chunk@1'], s.get('chunk@1_ci_wilson'), True)} | "
-            f"{fmt(s['chunk@3'], True)} | "
-            f"{fmt(s['chunk@5'], True)} | {fmt(s['mrr@10'])} | {fmt(s['ndcg@10'])} | "
+            f"{fmt(s['doc@1'], True)} | {fmt(s.get('doc_recall_all@5'), True)} | "
+            f"{with_ci(s['chunk@1'], s.get('chunk@1_ci_wilson'), True)} | "
+            f"{fmt(s['chunk@3'], True)} | {fmt(s['chunk@5'], True)} | "
+            f"{fmt(s['mrr@10'])} | {fmt(s['ndcg@10'])} | "
             f"${s['usd_cold_per_query']:.5f} | "
             f"{s['p50_ms']}ms | {s['p95_ms']}ms |")
     note = dataset_note or ("评测集 30 题（single 12 / entity 6 / multi 6 / global 3 / none 3）；"
@@ -306,9 +318,10 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
               f"- {note}",
               "- `可答 acc` 只算可回答问题（所有 rung 同一分母）；`弃答 acc` 只算无答案题，所有 rung 都报。",
               "- 方括号是 Wilson 95% 置信区间（小样本比例比 bootstrap 更稳）；bootstrap 结果仍在 `summary.json`。",
-              "- 综合分 = 100 × (0.50×可答 acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。",
+              "- 综合分 = 100 × (0.50×可答 acc + 0.30×evidence R@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。",
+              "- `evidence R@k` = gold evidence 是否进入最终上下文；`doc all@5` 要求所有 gold 文档都进 top-5（多跳更严）。",
               "- RAPTOR 摘要节点按「覆盖 gold 文档」算命中，不要求摘要逐字包含 evidence。",
-              "- `chunk@1` / `MRR@10` 是主指标；`doc R@5` 在原始语料上会饱和。",
+              "- `evidence R@1` / `MRR@10` 是主指标；`doc R@5` 在原始语料上会饱和。",
               "- 成本逐条见 `results/cost.jsonl`。"]
     (out_dir / "leaderboard.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote {out_dir / 'leaderboard.md'}")

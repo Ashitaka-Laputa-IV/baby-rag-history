@@ -86,7 +86,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 ## 结果（30 题，1,000 篇 / 4,740 chunks）
 
-| rung | 里程碑 | 可答 acc | chunk hit@5 | 弃答 acc | cold $/q |
+| rung | 里程碑 | 可答 acc | evidence R@5 | 弃答 acc | cold $/q |
 |---|---|---:|---:|---:|---:|
 | `r0_dense` | Naive RAG | 88.9% | 96.3% | 100.0% | $0.00030 |
 | `r1_hybrid` | Hybrid + RRF | 88.9% | 96.3% | 100.0% | $0.00030 |
@@ -113,7 +113,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 把 chunk 里的标题替换成「（标题已隐藏）」、另加 200 篇同姓/同类型干扰文档后，差距明显拉开：
 
-| rung | acc | doc@1 | chunk@1 | chunk@3 | chunk@5 | MRR@10 | nDCG@10 |
+| rung | acc | doc@1 | evidence R@1 | R@3 | R@5 | MRR@10 | nDCG@10 |
 |---|---|---:|---:|---:|---:|---:|---:|
 | `r0_dense` | 70.4% | 81.5% | 44.4% | 59.3% | 63.0% | 0.473 | 0.497 |
 | `r1_hybrid` | 77.8% | 81.5% | 44.4% | 70.4% | 70.4% | 0.500 | 0.534 |
@@ -131,10 +131,12 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 | 指标 | 原始 | masked |
 |---|---:|---:|
 | doc@1 | 90.0% | 81.5–85.2% |
-| chunk@1 | 48.1–85.2% | 29.6–59.3% |
+| evidence R@1 | 48.1–85.2% | 29.6–59.3% |
 | 可答 acc | 88.9–100% | 66.7–77.8% |
 
-**结论**：真正的区分度来自 **chunk@1 / MRR**，而不是 doc R@5。r5 contextual 在排序指标上最强；r8 agentic 的 acc 不再领先，首轮命中反而偏低（44.4%）。
+> `evidence R@k` 就是 gold evidence 是否进入最终 top-k 上下文；`doc all@5` 更严格，要求所有 gold 文档都进 top-5（单跳题与 doc@5 相同，多跳题才体现差异）。
+>
+> **结论**：真正的区分度来自 **evidence R@1 / MRR**，而不是 doc R@5。r5 contextual 在排序指标上最强；r8 agentic 的 acc 不再领先，首轮命中反而偏低（44.4%）。
 
 完整表：`results/masked/leaderboard.md`。
 
@@ -142,7 +144,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 原本写了 29 道，但复核发现 **4 道指代不清**（`h010/h011/h021/h022` 用「该市镇/该师团」导致所有 rung 都无法定位），已剔除。下表是 **25 道公平题**，每题 evidence 都校验过落在 gold 文档内。原索引上：
 
-| rung | acc | chunk@1 | chunk@3 | MRR@10 |
+| rung | acc | evidence R@1 | R@3 | MRR@10 |
 |---|---|---:|---:|---:|
 | `r0_dense` | 92.0% | 68.0% | 92.0% | 0.797 |
 | `r1_hybrid` | 92.0% | 64.0% | 92.0% | 0.777 |
@@ -159,7 +161,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 ### 三套对比（怎么读）
 
-| 设置 | acc 范围 | chunk@1 范围 | 谁赢 |
+| 设置 | acc 范围 | evidence R@1 范围 | 谁赢 |
 |---|---|---|---|
 | 原题 + 原索引 | 88.9–100% | 48.1–85.2% | r5（acc 100%） |
 | 原题 + masked | 66.7–77.8% | 29.6–59.3% | r5 排序 |
@@ -168,7 +170,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 ### 综合分（效果 × 成本）
 
-公式：`综合 = 100 × (0.50×可答 acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`
+公式：`综合 = 100 × (0.50×可答 acc + 0.30×evidence R@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`
 
 > v2 评测协议：`可答 acc` 只算可回答问题（所有 rung 同一分母），`弃答 acc` 单独一列；方括号是 1,000 次 bootstrap 的 95% CI；RAPTOR 摘要节点按「覆盖 gold 文档」算命中；judge 做了 30 条 A/B 字段对调校准（30/30 一致，但仍不是人工标注）。
 
@@ -187,7 +189,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 
 **综合看**：`r5 contextual` 赢 3/4 套，`r4 multi-query` 赢「难题 + masked」；`r2 rerank` 稳定前三，是最低成本的高分档；`r3 HyDE`、`r8 agentic`、`adaptive` 综合分偏低。
 
-**真正稳定的结论**：`r2 rerank` 是低成本高收益；`r5 contextual` 在排序指标上稳定靠前；`r3 HyDE` 在这份中文维基语料上经常**反噬**（假答案把正确 chunk 挤掉）；`r8 agentic` 的可答 acc 并不领先，chunk@1 偏低——多轮检索没有改善首轮命中。
+**真正稳定的结论**：`r2 rerank` 是低成本高收益；`r5 contextual` 在排序指标上稳定靠前；`r3 HyDE` 在这份中文维基语料上经常**反噬**（假答案把正确 chunk 挤掉）；`r8 agentic` 的可答 acc 并不领先，evidence R@1 偏低——多轮检索没有改善首轮命中。
 
 ### 协议 v2 的额外检查
 
@@ -196,7 +198,7 @@ uv run python -m scripts.run_eval --rungs all --workers 4
 - **judge A/B 校准**：抽了 30 条答案（15 个唯一问题），正常顺序与字段对调顺序 **30/30 一致**，与存储分数也 30/30 一致。这只是位置偏差检查，不是人工标注。
 - **回顾性 test split**：按题型分层抽出 10 道（single 4 / entity 2 / multi 2 / global 1 / none 1）：
 
-| rung | test 可答 acc | test chunk@1 | 综合 |
+| rung | test 可答 acc | test evidence R@1 | 综合 |
 |---|---|---:|---:|
 | `r5_contextual` | 100.0% [70–100] | 100.0% [70–100] | **95.1** |
 | `r2_rerank` | 88.9% [56–98] | 88.9% [56–98] | 84.6 |

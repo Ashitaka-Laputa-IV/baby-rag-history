@@ -15,6 +15,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.963,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.7407,
     "chunk@1_ci": [
       0.5926,
@@ -67,6 +69,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.9259,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.7778,
     "chunk@1_ci": [
       0.6296,
@@ -119,6 +123,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 1,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.7778,
     "chunk@1_ci": [
       0.6296,
@@ -171,6 +177,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.963,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.4815,
     "chunk@1_ci": [
       0.2963,
@@ -223,6 +231,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 1,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.8148,
     "chunk@1_ci": [
       0.6667,
@@ -275,6 +285,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 1,
+    "context_precision@5": 0.2148,
     "chunk@1": 0.8519,
     "chunk@1_ci": [
       0.7037,
@@ -327,6 +339,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 1,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.8148,
     "chunk@1_ci": [
       0.6667,
@@ -379,6 +393,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.9259,
+    "context_precision@5": 0.7531,
     "chunk@1": 0.8148,
     "chunk@1_ci": [
       0.6296,
@@ -431,6 +447,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.9259,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.7778,
     "chunk@1_ci": [
       0.5926,
@@ -483,6 +501,8 @@
     ],
     "doc@1": 1,
     "doc_recall@5": 1,
+    "doc_recall_all@5": 0.963,
+    "context_precision@5": 0.2074,
     "chunk@1": 0.8148,
     "chunk@1_ci": [
       0.6667,

@@ -92,6 +92,15 @@ def main() -> int:
                              if gold & set(h.get("doc_ids") or [h.get("doc_id", "")])), None)
             chunk_rank = next((i for i, h in enumerate(hits, start=1) if relevant(h)), None) if evidence else None
             row["doc@1"] = int(doc_rank == 1) if doc_rank else (0 if gold else None)
+            top_docs = set()
+            for h in hits[:5]:
+                top_docs.update(h.get("doc_ids") or [h.get("doc_id", "")])
+            row["doc_recall_all@5"] = (int(bool(gold) and gold.issubset(top_docs))
+                                       if gold else None)
+            row["context_precision@5"] = (
+                round(sum(1 for h in hits[:5] if relevant(h)) / len(hits[:5]), 4)
+                if hits and evidence else None
+            )
             row["chunk@1"] = int(chunk_rank == 1) if evidence else None
             row["chunk@3"] = int(chunk_rank is not None and chunk_rank <= 3) if evidence else None
             row["chunk@5"] = int(chunk_rank is not None and chunk_rank <= 5) if evidence else None
