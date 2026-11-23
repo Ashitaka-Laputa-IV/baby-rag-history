@@ -70,6 +70,9 @@ uv run python -m scripts.run_eval --rungs all --queries eval/queries-test.jsonl 
 # 中段事实 50 题（手写）
 uv run python -m scripts.run_eval --rungs all --queries eval/queries-manual50.jsonl --workers 3
 
+# 中段事实 50 题（弱模型）
+uv run python -m scripts.run_eval --rungs all --queries eval/queries-manual50.jsonl --provider siliconflow --workers 3
+
 # 弱模型对照（SiliconFlow 免费 Qwen2.5-7B）
 uv run python -m scripts.run_eval --rungs all --provider siliconflow --workers 4
 

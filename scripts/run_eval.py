@@ -40,6 +40,8 @@ def main() -> int:
     if args.provider == "siliconflow":
         slug = (args.model or "Qwen/Qwen2.5-7B-Instruct").replace("/", "-").replace(".", "").lower()
         run_name = f"siliconflow-{slug}"
+        if tag:
+            run_name += f"-{tag}"
     elif args.variant == "public":
         run_name = "public"
     elif tag:
@@ -52,8 +54,12 @@ def main() -> int:
     summary = summarize(rows)
     if args.provider == "siliconflow":
         label = f"SiliconFlow {settings.model}"
-        note = (f"弱模型对照：{settings.model}（SiliconFlow 免费档）。30 道原题；"
-                "成本按 $0 记录，不与 DeepSeek 主榜混算。")
+        if manual:
+            note = (f"弱模型对照：{settings.model}（SiliconFlow 免费档）。50 道中段事实手写题；"
+                    "成本按 $0 记录，不与 DeepSeek 主榜混算。judge 也是该弱模型，正确率噪声更大。")
+        else:
+            note = (f"弱模型对照：{settings.model}（SiliconFlow 免费档）。30 道原题；"
+                    "成本按 $0 记录，不与 DeepSeek 主榜混算。")
     elif test:
         label = "retrospective test split"
         note = "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。"

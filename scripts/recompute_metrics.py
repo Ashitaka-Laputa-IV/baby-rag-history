@@ -36,6 +36,10 @@ RUNS = {
         "SiliconFlow Qwen/Qwen2.5-7B-Instruct",
         "弱模型对照：Qwen/Qwen2.5-7B-Instruct（SiliconFlow 免费档）。30 道原题；成本按 $0 记录，不与 DeepSeek 主榜混算。",
         False),
+    "siliconflow-qwen-qwen25-7b-instruct-manual50": (
+        "SiliconFlow Qwen/Qwen2.5-7B-Instruct · middle-fact 50",
+        "弱模型对照：Qwen/Qwen2.5-7B-Instruct（SiliconFlow 免费档）。50 道中段事实手写题；成本按 $0 记录，不与 DeepSeek 主榜混算；judge 也是该弱模型。",
+        False),
 }
 
 
