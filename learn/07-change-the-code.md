@@ -54,7 +54,7 @@ hits = (state.get("hits") or [])[:5]
 
 想改成 top-3：
 
-1. 在 [config.py:71](../src/babyrag/config.py#L71) 加 `FINAL_TOP_K = 3`。
+1. 在 [config.py:73](../src/babyrag/config.py#L73) 加 `FINAL_TOP_K = 3`。
 2. 把 `generate` 的 `[:5]` 改成 `[:FINAL_TOP_K]`。
 3. 把 `rerank` 的 `top_n=5` 也改成 `FINAL_TOP_K`，否则上游仍给 5 条。
 4. 重跑评测，报告里的说明也要改。

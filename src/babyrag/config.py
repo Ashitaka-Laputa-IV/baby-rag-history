@@ -25,37 +25,39 @@ CHROMA_DIR = DATA / "chroma"
 BM25_DIR = DATA / "bm25"
 
 
-def variant_paths(variant: str) -> dict[str, Path]:
-    """Original (easy) vs masked (title-hidden, hard-negative) artifact paths."""
-    if variant == "public":
-        base = DATA / "public"
-        return {
-            "corpus": base / "corpus.jsonl",
-            "chunks": base / "chunks.jsonl",
-            "contextual": base / "contextual.jsonl",
-            "raptor": base / "raptor.jsonl",
-            "dense": "chunks_public",
-            "contextual_dense": "contextual_public",
-            "raptor_dense": "raptor_public",
-        }
-    if variant == "masked":
-        return {
-            "corpus": DATA / "corpus.masked.jsonl",
-            "chunks": DATA / "chunks.masked.jsonl",
-            "contextual": DATA / "contextual.masked.jsonl",
-            "raptor": DATA / "raptor.masked.jsonl",
-            "dense": "chunks_masked",
-            "contextual_dense": "contextual_masked",
-            "raptor_dense": "raptor_masked",
-        }
+@dataclass(frozen=True)
+class VariantLayout:
+    """One layout for every variant: a base directory plus two suffixes."""
+
+    base: Path
+    file_suffix: str = ""
+    collection_suffix: str = ""
+
+
+_VARIANT_LAYOUTS: dict[str, VariantLayout] = {
+    "original": VariantLayout(DATA),
+    "masked": VariantLayout(DATA, ".masked", "_masked"),
+    "public": VariantLayout(DATA / "public", "", "_public"),
+}
+
+
+def variant_paths(variant: str) -> dict[str, Path | str]:
+    """Resolve file paths and Chroma collections for a corpus variant.
+
+    All variants follow the same shape, so adding one only needs a
+    VariantLayout entry rather than another hand-written dict.
+    """
+    layout = _VARIANT_LAYOUTS.get(variant, _VARIANT_LAYOUTS["original"])
+    file_suffix = layout.file_suffix
+    collection_suffix = layout.collection_suffix
     return {
-        "corpus": CORPUS,
-        "chunks": CHUNKS,
-        "contextual": CONTEXTUAL,
-        "raptor": RAPTOR_NODES,
-        "dense": "chunks",
-        "contextual_dense": "contextual",
-        "raptor_dense": "raptor",
+        "corpus": layout.base / f"corpus{file_suffix}.jsonl",
+        "chunks": layout.base / f"chunks{file_suffix}.jsonl",
+        "contextual": layout.base / f"contextual{file_suffix}.jsonl",
+        "raptor": layout.base / f"raptor{file_suffix}.jsonl",
+        "dense": f"chunks{collection_suffix}",
+        "contextual_dense": f"contextual{collection_suffix}",
+        "raptor_dense": f"raptor{collection_suffix}",
     }
 
 DEFAULT_BASE_URL = "https://opencode.ai/inference/go/openai/v1"
@@ -93,7 +95,7 @@ class Settings:
     provider: str = "opencode"
 
     @property
-    def paths(self) -> dict[str, Path]:
+    def paths(self) -> dict[str, Path | str]:
         return variant_paths(self.variant)
 
 

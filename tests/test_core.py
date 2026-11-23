@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from babyrag.config import variant_paths
 from babyrag.prompts import parse_queries, parse_relevant, parse_route, parse_score
 from babyrag.retrieval import fuse_rrf
 from babyrag.rungs import RUNGS, adaptive_plan
@@ -53,3 +54,15 @@ def test_adaptive_rules() -> None:
     assert adaptive_plan("q", "none")[0] == "r7_crag"
     assert adaptive_plan("q", "global")[0] == "r6_raptor"
     assert adaptive_plan("短问题", "single")[0] == "r1_hybrid"
+
+
+def test_variant_paths_share_one_shape() -> None:
+    original = variant_paths("original")
+    masked = variant_paths("masked")
+    public = variant_paths("public")
+    assert original["corpus"].name == "corpus.jsonl"
+    assert masked["corpus"].name == "corpus.masked.jsonl"
+    assert public["corpus"].parent.name == "public"
+    assert original["dense"] == "chunks"
+    assert masked["dense"] == "chunks_masked"
+    assert public["dense"] == "chunks_public"

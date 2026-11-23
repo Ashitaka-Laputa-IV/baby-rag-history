@@ -12,8 +12,7 @@ import tiktoken
 from langchain_chroma import Chroma
 from rank_bm25 import BM25Okapi
 
-from .config import (CHROMA_DIR, CHUNKS, CONTEXTUAL, RAPTOR_NODES, Settings,
-                     ENCODING)
+from .config import CHROMA_DIR, ENCODING, Settings
 from .llm import build_embeddings, rerank
 from .types import Chunk
 
