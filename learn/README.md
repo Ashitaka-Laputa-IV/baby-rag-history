@@ -1,79 +1,83 @@
 ---
-title: 带你读 baby-rag-history 的 src
+title: 从零读懂 baby-rag-history
 date: 2026-11-23
 input_shape: concept
-subject: baby-rag-history 源码结构与调用链
+subject: baby-rag-history 项目的完整学习路线
 ---
 
-# 带你读 src
+# 从零读懂 baby-rag-history
 
-这不是 API 手册，而是**按调用链读源码**的路线。读完后你应该能回答：
+这套文档假设你**还没读过这个项目的代码**，甚至对 RAG 只有模糊印象。
+它不按文件夹讲，而是跟着一个问题走完全程。你不需要记住所有细节，只要跟着故事走。
 
-- 一次 `babyrag ask` 从参数到答案经过了哪些函数？
-- 为什么九个 rung 只需要一张图？
-- 检索、生成、评测三层的边界在哪里？
-- 改一个行为时应该动哪个文件？
+## 一句话说清这个项目
 
-## 30 秒心智模型
+> 把 9 种“让 AI 先查资料再回答”的做法，放进**同一条流水线**，
+> 用**同一套题**考试，看谁真的更好、贵多少、错在哪。
+
+这里的“让 AI 先查资料再回答”，就是 **RAG**（Retrieval-Augmented Generation，检索增强生成）。
+
+## 读完这套文档，你应该能
+
+- 用自己的话解释：一个问题从输入到答案，中间经过了什么。
+- 说出 9 个 rung（台阶）分别多做了什么，为什么有的反而更差。
+- 看懂排行榜里的 `acc`、`evidence R@1`、`MRR`、综合分是什么意思。
+- 知道想改一个行为时，应该动哪个文件。
+- 不被“LangGraph”“embedding”“RRF”这些词吓住。
+
+## 先记住三个数字
+
+| 数字 | 含义 |
+|---:|---|
+| **1,000** | 中文维基文档数量（5 个主题各 200 篇） |
+| **4,740** | 把文档切成的“小卡片”（chunk）数量 |
+| **5** | 每次回答最多看 5 张卡片，总共不超过 4,000 token |
+
+再加一个：**9 + 1**。9 个 rung，加一个会自己选路的 `adaptive`。
+
+## 整条路长什么样
 
 ```mermaid
 flowchart LR
-  CLI[cli.py] --> CFG[config.py]
-  CLI --> SVC[retrieval.Services]
-  CLI --> LLM[llm.LLMClient]
-  CLI --> G[graph.build_graph]
-  G --> RUN[graph.Runner]
-  RUN --> SVC
-  RUN --> LLM
-  EV[eval.py] --> G
-  EV --> LLM
-  SVC --> CH[(Chroma / BM25)]
-  LLM --> CACHE[(SQLite cache)]
+  Q[你的问题] --> R[检索：找出相关卡片]
+  R --> S[排序：把最相关的放前面]
+  S --> G[生成：看着卡片写答案]
+  G --> E[评测：和标准答案对比]
 ```
 
-一句话：**`config` 提供路径和价格，`llm` 提供带缓存和计费的模型调用，
-`retrieval` 提供检索器，`graph` 把节点串成一张图，`eval` 在外面跑批量并算指标。**
+九个 rung 的差别，全在**检索和排序**这一段。生成和评分对所有人都一样。
 
-## 阅读顺序
+## 怎么读
 
-| # | 文档 | 你会学到 | 主要文件 | 建议时间 |
-|---|---|---|---|---|
-| 1 | [一次请求的生命周期](01-request-lifecycle.md) | `ask` 的完整调用链和状态流 | `cli.py`, `graph.py` | 20 min |
-| 2 | [配置与类型](02-config-types.md) | 路径、价格、`RAGState`、reducer | `config.py`, `types.py` | 15 min |
-| 3 | [模型与缓存](03-llm-cache.md) | OpenCode Go session、计费、SQLite 缓存 | `llm.py`, `cache.py` | 25 min |
-| 4 | [检索层](04-retrieval.md) | dense、BM25、RRF、rerank、上下文拼装 | `retrieval.py` | 30 min |
-| 5 | [Rung 计划表](05-rungs.md) | 九个里程碑如何变成一行计划 | `rungs.py` | 10 min |
-| 6 | [Graph 节点](06-graph.md) | plan/dispatch、grade、agentic、generate | `graph.py` | 40 min |
-| 7 | [评测](07-evaluation.md) | 分母、evidence recall、Wilson、综合分 | `eval.py` | 35 min |
-| 8 | [CLI 与脚本](08-cli-scripts.md) | 数据/索引管线和命令入口 | `cli.py`, `scripts/` | 25 min |
-| 9 | [综合练习](09-capstone.md) | 加 rung、改 top-k、加指标、修 masked 泄漏 | 多处 | 2–4 h |
+按顺序读，每篇 10–20 分钟。不要一上来抠代码，先看故事和比喻；每篇最后有“想深入看代码”的链接。
 
-## 先跑一遍
+| 篇 | 标题 | 读完你会知道 |
+|---|---|---|
+| 1 | [一个问题的旅程](01-a-question-journey.md) | 一次提问从头到尾发生了什么 |
+| 2 | [数据与索引](02-data-and-index.md) | 语料怎么变成可检索的卡片 |
+| 3 | [检索的四种武器](03-retrieval.md) | 语义、关键词、投票、精排各自干什么 |
+| 4 | [九个台阶与一张图](04-rungs-and-graph.md) | 9 个 rung 如何共用一张流水线 |
+| 5 | [模型调用与省钱](05-llm-and-cost.md) | 为什么缓存能省下大部分钱 |
+| 6 | [怎么证明它有效](06-evaluation.md) | 排行榜的数字到底怎么来的 |
+| 7 | [动手改代码](07-change-the-code.md) | 想改行为时从哪里下手 |
+
+## 读之前，先做一件事
+
+如果你愿意，先跑一遍：
 
 ```bash
-uv sync
-cp .env.example .env          # 填 OPENCODE_GO_API_KEY / SILICONFLOW_API_KEY
-uv run python -m pytest -q    # 7 个纯逻辑测试，不需要网络
-uv run babyrag info           # 看 9 个 rung 的计划
-uv run babyrag ask "开姆尼茨工业大学的前身创办于哪一年？" --rung r2_rerank
+uv run babyrag info
 ```
 
-如果只想读代码、不想花钱：先看 `tests/test_core.py`，它覆盖了 RRF、解析器、rung 表。
+它会打印 9 个 rung 的名字和步骤。看不懂没关系，读完第 4 篇再回来看，你会一眼认出每一行。
 
-## 约定
+## 最后一句
 
-- 代码引用写成 `[graph.py:58](../src/babyrag/graph.py#L58)`；GitHub 会跳到对应行。
-- “文档说” 指 `docs/` 里的说明；“代码是” 指我实际读到的实现。
-- 发现文档和代码不一致时，以代码为准，并在那一节标出来。
+> 这个项目不是“造一个最强 RAG”，而是**造一把尺子**：
+> 同一份资料、同一批题、同一个预算，量出每种做法的真实代价。
 
-## Check yourself
+## 检查一下
 
-1. 不看目录，说出 `src/babyrag/` 下五个模块各自的一句话职责。
-2. 为什么 `Services` 和 `LLMClient` 不进 `RAGState`？
-3. 如果只想改“最终上下文最多几条”，应该动哪个文件？
+**问：** 这个项目里，9 个 rung 主要在哪一段不同？
 
-### Answers
-
-1. `config` 路径/价格/环境；`llm` 模型调用与计费；`retrieval` 检索器；`graph` 状态机；`eval` 批量评测。`cache` 是 `llm` 的存储层。
-2. 它们持有 Chroma client、SQLite 连接等不可序列化对象，放 state 会让 checkpointer 失败，也会把每次调用的状态变大。代码里由 `Services` 懒加载、`LLMClient` 在 `_env` 里按线程创建。
-3. `src/babyrag/graph.py:232` 的 `hits[:5]`；预算在 `config.py:71` 的 `MAX_CONTEXT_TOKENS`。答对位置即可。
+**答：** 检索和排序。生成用的模型、提示词、上下文预算对所有 rung 都一样，所以差别能被归因到检索链路。

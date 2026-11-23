@@ -77,15 +77,13 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 
 | 篇 | 内容 |
 |---|---|
-| [一次请求的生命周期](learn/01-request-lifecycle.md) | `ask` 从 CLI 到答案的完整状态流 |
-| [配置与类型](learn/02-config-types.md) | 路径、价格、`RAGState`、reducer |
-| [模型与缓存](learn/03-llm-cache.md) | OpenCode Go session、计费、SQLite 缓存 |
-| [检索层](learn/04-retrieval.md) | dense、BM25、RRF、rerank、上下文拼装 |
-| [Rung 计划表](learn/05-rungs.md) | 九个里程碑如何变成一行计划 |
-| [Graph 节点](learn/06-graph.md) | plan/dispatch、grade、agentic、generate |
-| [评测](learn/07-evaluation.md) | 分母、evidence recall、Wilson、综合分 |
-| [CLI 与脚本](learn/08-cli-scripts.md) | 数据/索引管线和命令入口 |
-| [综合练习](learn/09-capstone.md) | 加 rung、改 top-k、加指标、修 masked 泄漏 |
+| [一个问题的旅程](learn/01-a-question-journey.md) | 一次提问从头到尾发生了什么 |
+| [数据与索引](learn/02-data-and-index.md) | 语料怎么变成可检索的卡片 |
+| [检索的四种武器](learn/03-retrieval.md) | 语义、关键词、投票、精排各自干什么 |
+| [九个台阶与一张图](learn/04-rungs-and-graph.md) | 9 个 rung 如何共用一张流水线 |
+| [模型调用与省钱](learn/05-llm-and-cost.md) | 为什么缓存能省下大部分钱 |
+| [怎么证明它有效](learn/06-evaluation.md) | 排行榜的数字到底怎么来的 |
+| [动手改代码](learn/07-change-the-code.md) | 想改行为时从哪里下手 |
 
 ## 数据
 
