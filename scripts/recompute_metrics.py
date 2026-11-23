@@ -29,6 +29,9 @@ RUNS = {
     "test": ("retrospective test split",
              "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。",
              False),
+    "manual50": ("middle-fact questions (50, handwritten)",
+                 "50 道手写题，五主题各 10；答案均为文档中段的事实，evidence 已校验落在 gold 文档中间三分之一的 chunk 内。",
+                 False),
     "siliconflow-qwen-qwen25-7b-instruct": (
         "SiliconFlow Qwen/Qwen2.5-7B-Instruct",
         "弱模型对照：Qwen/Qwen2.5-7B-Instruct（SiliconFlow 免费档）。30 道原题；成本按 $0 记录，不与 DeepSeek 主榜混算。",
@@ -51,6 +54,7 @@ def main() -> int:
     queries = {q["qid"]: q for q in read(EVAL / "queries.jsonl")}
     queries.update({q["qid"]: q for q in read(EVAL / "queries-hard.jsonl")})
     queries.update({q["qid"]: q for q in read(EVAL / "queries-test.jsonl")})
+    queries.update({q["qid"]: q for q in read(EVAL / "queries-manual50.jsonl")})
     chunk_texts = {
         "original": {r["chunk_id"]: r["text"] for r in read(DATA / "chunks.jsonl")},
         "masked": {r["chunk_id"]: r["text"] for r in read(DATA / "chunks.masked.jsonl")},

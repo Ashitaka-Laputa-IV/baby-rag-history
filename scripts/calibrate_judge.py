@@ -21,6 +21,7 @@ def main() -> int:
     settings = load_settings()
     queries = {q["qid"]: q for q in read(EVAL / "queries.jsonl")}
     queries.update({q["qid"]: q for q in read(EVAL / "queries-hard.jsonl")})
+    queries.update({q["qid"]: q for q in read(EVAL / "queries-manual50.jsonl")})
     rows = [r for r in read(RUNS / "per_query.jsonl")
             if r.get("type") != "none" and r.get("correct") in (0, 1)]
     positives = [r for r in rows if r["correct"] == 1]

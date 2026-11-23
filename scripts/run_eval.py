@@ -28,19 +28,24 @@ def main() -> int:
         os.environ["BABYRAG_LLM_MODEL"] = args.model
     chosen = ALL_RUNGS if args.rungs == "all" else [r.strip() for r in args.rungs.split(",")]
     queries_path = Path(args.queries) if args.queries else None
-    hard = queries_path is not None and "hard" in queries_path.name
-    test = queries_path is not None and "test" in queries_path.name
+    tag = ""
+    if queries_path is not None:
+        tag = queries_path.stem.removeprefix("queries-")
+        if tag == queries_path.stem:
+            tag = ""
+    hard = tag == "hard"
+    test = tag == "test"
+    manual = tag.startswith("manual")
     run_name = None
     if args.provider == "siliconflow":
         slug = (args.model or "Qwen/Qwen2.5-7B-Instruct").replace("/", "-").replace(".", "").lower()
         run_name = f"siliconflow-{slug}"
-    elif args.variant == "masked" or args.variant == "public" or hard or test:
-        if test:
-            run_name = "test"
-        elif hard:
-            run_name = f"{args.variant}-hard" if args.variant == "masked" else "hard"
-        else:
-            run_name = args.variant
+    elif args.variant == "public":
+        run_name = "public"
+    elif tag:
+        run_name = f"{args.variant}-{tag}" if args.variant == "masked" else tag
+    elif args.variant == "masked":
+        run_name = args.variant
     settings = load_settings()
     rows = evaluate(settings, rungs=chosen, limit=args.limit, workers=args.workers,
                     queries_path=queries_path, run_name=run_name)
@@ -55,6 +60,10 @@ def main() -> int:
     elif args.variant == "public":
         label = "RAGBench external anchor"
         note = "RAGBench emanual test 子集（40 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。"
+    elif manual:
+        label = "middle-fact questions (50, handwritten)"
+        note = ("50 道手写题，答案均为文档中段的事实；每题 evidence 已校验落在 gold 文档中间三分之一的 chunk 内。"
+                "用于单独衡量“中段事实”检索，不替代原 30 题主榜。")
     elif hard:
         label = "masked + hard questions" if args.variant == "masked" else "hard questions"
         note = "29 道手写难题：避开文档标题，保留年份/地区/职业等限定词；每题 evidence 已校验落在 gold 文档内。"

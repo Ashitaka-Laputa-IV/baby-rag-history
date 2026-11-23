@@ -38,7 +38,7 @@
 
 ## 4. 已知偏差
 
-- **样本小**：原题 30、难题 25、test 10、公开 25；1–2 道题的差异不构成结论。
+- **样本小**：原题 30、难题 25、test 10、中段事实 50、公开 25；1–2 道题的差异不构成结论。
 - **标题泄漏**：原题 23/30 含 gold 标题；masked 变体去除标题并加 200 篇干扰文档。
 - **masked 是近似**：contextual 前缀复用原前缀、替换标题后重新嵌入，没有重新跑 5,676 次生成。
   另外，chunk 文本去掉了标题，但 metadata 的 `title` 仍会由 `build_context` 拼回上下文，
@@ -49,6 +49,8 @@
 - **faithfulness 偏宽松**：30 条抽样里 29 条 `supported=1.0`，不能用来排名。
 - **公开锚点小**：25 题英文手册，r5/r6 没有公共索引。
 - **题库作者偏差**：25 道难题是项目作者手写的，可能偏向某些失败模式。
+- **中段事实题偏向数字**：50 题由作者读 chunk 后反写，且选题时优先含数字的 chunk；
+  它衡量“中段事实能否被检索到”，不代表真实用户的问题分布。
 
 ## 5. 复现
 
@@ -64,6 +66,9 @@ uv run python -m scripts.run_eval --rungs all --queries eval/queries-hard.jsonl 
 
 # 回顾性 test split
 uv run python -m scripts.run_eval --rungs all --queries eval/queries-test.jsonl --workers 3
+
+# 中段事实 50 题（手写）
+uv run python -m scripts.run_eval --rungs all --queries eval/queries-manual50.jsonl --workers 3
 
 # 弱模型对照（SiliconFlow 免费 Qwen2.5-7B）
 uv run python -m scripts.run_eval --rungs all --provider siliconflow --workers 4

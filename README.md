@@ -134,7 +134,11 @@ r5 仍有 88.9%；准确率差距从 11pp 拉到 26pp。也就是说，**强模�
 - **r3 HyDE 反噬**：acc 不低，但 `evidence R@1` 只有 48.1% / 29.6%，假答案会挤掉正确 chunk。
 - **r8 agentic** 的可答 acc 不领先，`evidence R@1` 偏低；多轮检索没有改善首轮命中。
 
-完整六套表与解读：[`docs/results.md`](docs/results.md)。
+完整评测表与解读：[`docs/results.md`](docs/results.md)。
+
+**中段事实 50 题**（单独新集，五主题各 10，答案都在文档中段）：题面点名实体，`doc@1` 全部 100%，
+差距全在文档内部。`r2`/`r5`/`r6` 的 `evidence R@1` 都是 96%，`r0` 72%，`r3` 70%。
+这套题说明：**难的不是找文档，是在长文档里定位中段事实**。
 
 ## 成本
 
@@ -153,7 +157,7 @@ r5 仍有 88.9%；准确率差距从 11pp 拉到 26pp。也就是说，**强模�
 ```text
 src/babyrag/        # graph, retrieval, eval, llm, cache
 scripts/            # 语料、索引、评测、重建
-eval/               # queries.jsonl, queries-hard.jsonl, queries-test.jsonl
+eval/               # queries.jsonl, queries-hard.jsonl, queries-test.jsonl, queries-manual50.jsonl
 results/            # 每套评测的 leaderboard / summary / per_query / cost
 docs/               # 设计、结果、指标、里程碑
 research/           # 实现前研究（有过期假设）
@@ -163,6 +167,7 @@ research/           # 实现前研究（有过期假设）
 
 - 原题 30 道，global 和 no-answer 各只有 3 道；10 道 test split 是回顾性的，不是真 holdout。
 - 难题集是 25 道单跳改写题，没有覆盖多跳/全局。
+- 中段事实 50 题由作者读 chunk 后反写，选题时优先含数字的 chunk，存在选择偏差；它衡量“中段事实能否被检索到”，不代表真实用户的问题分布。
 - masked 的 contextual 前缀是从原前缀派生的近似，没有重新跑 5,676 次 LLM；而且只去掉了 chunk 文本里的标题，metadata 的 `title` 仍会拼进上下文，属于**部分去偏**。
 - faithfulness 只有 30 条抽样、单 judge，区分度低。
 - 公开锚点只有 RAGBench `emanual` 的 25 题英文手册，不是中文语料的外部验证。

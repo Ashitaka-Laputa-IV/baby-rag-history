@@ -94,6 +94,7 @@ rung 之间的差值包含前面所有改动。严格的单因素消融需要另
 | `eval/queries.jsonl` | 30（single 12 / entity 6 / multi 6 / global 3 / none 3） | 主榜 |
 | `eval/queries-hard.jsonl` | 29 道手写，剔除 4 道指代不清后 **25 道公平题** | 去标题线索 |
 | `eval/queries-test.jsonl` | 10（回顾性 split） | 稳健性检查 |
+| `eval/queries-manual50.jsonl` | 50 道手写，五主题各 10 | 中段事实 |
 | `data/public/queries.jsonl` | 25（RAGBench emanual） | 英文外部锚点 |
 
 ## 5. 评测协议
