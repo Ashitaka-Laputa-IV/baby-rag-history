@@ -100,6 +100,11 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 | `r8_agentic` | 76.5 | 57.0 | 73.5 | 71.8 |
 | `adaptive` | 81.1 | 59.3 | 78.1 | 77.2 |
 
+![综合分折线图](docs/assets/composite-line.png)
+
+> 橙色是 masked 变体，整条线比原题低约 20 分：标题泄漏对分数的贡献非常直观。
+> 可下载 [SVG](docs/assets/composite-line.svg) 放大看。
+
 **四个稳定结论**：
 
 - **r5 contextual** 赢 3/4 套；索引期补语境是这份语料上最有效的单点改动。

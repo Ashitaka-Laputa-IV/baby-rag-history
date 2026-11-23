@@ -8,6 +8,11 @@
 - `MRR@10`：gold evidence 第一次出现的排名倒数。
 - `综合`：`100 × (0.50×可答 acc + 0.30×evidence R@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`。
 
+![综合分折线图](assets/composite-line.png)
+
+> 橙色是 masked 变体，整条线比原题低约 20 分：标题泄漏对分数的贡献非常直观。
+> 可下载 [SVG](assets/composite-line.svg) 放大看。
+
 ## 1. 原题 30（原索引）
 
 | rung | 可答 acc | evidence R@1 | evidence R@5 | MRR@10 | 综合 |
