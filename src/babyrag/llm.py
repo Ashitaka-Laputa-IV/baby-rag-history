@@ -50,6 +50,8 @@ class LLMClient:
         self.cache = Cache(CACHE_DB)
         self._max_output = max_output_tokens
         self._temperature = temperature
+        headers = ({"x-opencode-session": settings.session_id}
+                   if settings.provider == "opencode" else None)
         self._llm = ChatOpenAI(
             model=settings.model,
             api_key=settings.api_key,
@@ -58,7 +60,7 @@ class LLMClient:
             max_tokens=max_output_tokens,
             timeout=120,
             max_retries=2,
-            default_headers={"x-opencode-session": settings.session_id},
+            default_headers=headers,
         )
         self.spent_usd = 0.0
 
@@ -88,7 +90,10 @@ class LLMClient:
         latency_ms = int((time.perf_counter() - started) * 1000)
         text = _message_text(response)
         tin, tout, cached_in = _usage(response, messages, text)
-        cost = (tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ)
+        if self.settings.provider == "siliconflow":
+            cost = 0.0  # free-tier chat model on SiliconFlow
+        else:
+            cost = (tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ)
         self.spent_usd += cost
         if use_cache:
             self.cache.put(key, json.dumps(

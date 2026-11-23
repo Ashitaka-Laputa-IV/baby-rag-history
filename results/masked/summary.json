@@ -1,6 +1,7 @@
 {
   "r0_dense": {
     "n": 30,
+    "errors": 0,
     "correct": 19,
     "correct_n": 27,
     "abstain_n": 3,
@@ -55,6 +56,7 @@
   },
   "r1_hybrid": {
     "n": 30,
+    "errors": 0,
     "correct": 21,
     "correct_n": 27,
     "abstain_n": 3,
@@ -109,6 +111,7 @@
   },
   "r2_rerank": {
     "n": 30,
+    "errors": 0,
     "correct": 20,
     "correct_n": 27,
     "abstain_n": 3,
@@ -163,6 +166,7 @@
   },
   "r3_hyde": {
     "n": 30,
+    "errors": 0,
     "correct": 21,
     "correct_n": 27,
     "abstain_n": 3,
@@ -217,6 +221,7 @@
   },
   "r4_multiquery": {
     "n": 30,
+    "errors": 0,
     "correct": 19,
     "correct_n": 27,
     "abstain_n": 3,
@@ -271,6 +276,7 @@
   },
   "r5_contextual": {
     "n": 30,
+    "errors": 0,
     "correct": 21,
     "correct_n": 27,
     "abstain_n": 3,
@@ -325,6 +331,7 @@
   },
   "r6_raptor": {
     "n": 30,
+    "errors": 0,
     "correct": 18,
     "correct_n": 27,
     "abstain_n": 3,
@@ -379,6 +386,7 @@
   },
   "r7_crag": {
     "n": 30,
+    "errors": 0,
     "correct": 20,
     "correct_n": 27,
     "abstain_n": 3,
@@ -433,6 +441,7 @@
   },
   "r8_agentic": {
     "n": 30,
+    "errors": 0,
     "correct": 21,
     "correct_n": 27,
     "abstain_n": 3,
@@ -487,6 +496,7 @@
   },
   "adaptive": {
     "n": 30,
+    "errors": 0,
     "correct": 21,
     "correct_n": 27,
     "abstain_n": 3,

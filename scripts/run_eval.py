@@ -16,16 +16,25 @@ def main() -> int:
     ap.add_argument("--rungs", default="all")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--provider", default="opencode", choices=["opencode", "siliconflow"],
+                    help="chat model provider; siliconflow uses the free Qwen model")
+    ap.add_argument("--model", default=None, help="chat model id for the selected provider")
     ap.add_argument("--variant", default="original", choices=["original", "masked", "public"])
     ap.add_argument("--queries", default=None, help="path to a queries JSONL")
     args = ap.parse_args()
     os.environ["BABYRAG_VARIANT"] = args.variant
+    os.environ["BABYRAG_LLM_PROVIDER"] = args.provider
+    if args.model:
+        os.environ["BABYRAG_LLM_MODEL"] = args.model
     chosen = ALL_RUNGS if args.rungs == "all" else [r.strip() for r in args.rungs.split(",")]
     queries_path = Path(args.queries) if args.queries else None
     hard = queries_path is not None and "hard" in queries_path.name
     test = queries_path is not None and "test" in queries_path.name
     run_name = None
-    if args.variant == "masked" or args.variant == "public" or hard or test:
+    if args.provider == "siliconflow":
+        slug = (args.model or "Qwen/Qwen2.5-7B-Instruct").replace("/", "-").replace(".", "").lower()
+        run_name = f"siliconflow-{slug}"
+    elif args.variant == "masked" or args.variant == "public" or hard or test:
         if test:
             run_name = "test"
         elif hard:
@@ -36,7 +45,11 @@ def main() -> int:
     rows = evaluate(settings, rungs=chosen, limit=args.limit, workers=args.workers,
                     queries_path=queries_path, run_name=run_name)
     summary = summarize(rows)
-    if test:
+    if args.provider == "siliconflow":
+        label = f"SiliconFlow {settings.model}"
+        note = (f"弱模型对照：{settings.model}（SiliconFlow 免费档）。30 道原题；"
+                "成本按 $0 记录，不与 DeepSeek 主榜混算。")
+    elif test:
         label = "retrospective test split"
         note = "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。"
     elif args.variant == "public":

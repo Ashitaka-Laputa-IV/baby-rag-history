@@ -114,6 +114,17 @@ def _answer_one(settings: Settings, q: dict, rung: str, mode: str) -> dict:
 
 
 def _score(settings: Settings, q: dict, result: dict) -> dict:
+    if result.get("error"):
+        # A provider error is missing data, not a wrong answer. Exclude it from
+        # every denominator and report the count separately.
+        return {"error": True, "correct": None, "abstain_correct": None,
+                "doc@1": None, "doc_recall@1": None, "doc_recall@3": None,
+                "doc_recall@5": None, "doc_recall@10": None,
+                "doc_recall_all@5": None, "context_precision@5": None,
+                "chunk@1": None, "chunk@3": None, "chunk@5": None,
+                "chunk_hit@5": None, "mrr@10": None, "ndcg@10": None,
+                "citation_precision": None}
+
     hits = result.get("hits") or []
     gold_docs = set(q.get("gold_doc_ids") or [])
     evidence = q.get("evidence", "")
@@ -185,6 +196,7 @@ def summarize(rows: list[dict]) -> dict:
         correct = [r["correct"] for r in items if r.get("correct") is not None]
         out[rung] = {
             "n": len(items),
+            "errors": sum(1 for r in items if r.get("error")),
             "correct": sum(correct),
             "correct_n": len(correct),
             "abstain_n": sum(1 for r in items if r.get("abstain_correct") is not None),
@@ -209,12 +221,14 @@ def summarize(rows: list[dict]) -> dict:
             "usd_total": round(sum(costs), 6),
             "usd_per_query": round(sum(costs) / len(items), 6) if items else 0,
             "usd_cold_total": round(sum(
-                int(r.get("cost", {}).get("tokens_in", 0)) * PRICE_INPUT +
-                int(r.get("cost", {}).get("tokens_out", 0)) * PRICE_OUTPUT
+                0.0 if r.get("cost", {}).get("free")
+                else (int(r.get("cost", {}).get("tokens_in", 0)) * PRICE_INPUT +
+                      int(r.get("cost", {}).get("tokens_out", 0)) * PRICE_OUTPUT)
                 for r in items), 6),
             "usd_cold_per_query": round(sum(
-                int(r.get("cost", {}).get("tokens_in", 0)) * PRICE_INPUT +
-                int(r.get("cost", {}).get("tokens_out", 0)) * PRICE_OUTPUT
+                0.0 if r.get("cost", {}).get("free")
+                else (int(r.get("cost", {}).get("tokens_in", 0)) * PRICE_INPUT +
+                      int(r.get("cost", {}).get("tokens_out", 0)) * PRICE_OUTPUT)
                 for r in items) / len(items), 6) if items else 0,
             "p50_ms": latencies[len(latencies) // 2] if latencies else 0,
             "p95_ms": latencies[min(len(latencies) - 1, int(len(latencies) * 0.95))] if latencies else 0,
@@ -286,8 +300,8 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
 
     lines = [f"# baby-rag-history · {run_label}", "",
              "同一语料、同一批问题；`N/A` 表示该档不具备该能力，不是 0 分。", "",
-             "| rung | 里程碑 | 综合 | 可答 acc (95% CI) | 弃答 acc (95% CI) | doc@1 | doc all@5 | evidence R@1 (95% CI) | R@3 | R@5 | MRR@10 | nDCG@10 | cold $/q | p50 | p95 |",
-             "|---|---|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
+             "| rung | 里程碑 | 综合 | err | 可答 acc (95% CI) | 弃答 acc (95% CI) | doc@1 | doc all@5 | evidence R@1 (95% CI) | R@3 | R@5 | MRR@10 | nDCG@10 | cold $/q | p50 | p95 |",
+             "|---|---|---:|---:|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
     for rung, s in summary.items():
         def fmt(v, pct=False):
             if v is None:
@@ -304,6 +318,7 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
 
         lines.append(
             f"| `{rung}` | {LABELS.get(rung, rung)} | **{s.get('composite', 0):.1f}** | "
+            f"{s.get('errors', 0)} | "
             f"{with_ci(s['accuracy'], s.get('accuracy_ci_wilson'), True)} | "
             f"{with_ci(s['abstain_accuracy'], s.get('abstain_ci_wilson'), True)} | "
             f"{fmt(s['doc@1'], True)} | {fmt(s.get('doc_recall_all@5'), True)} | "

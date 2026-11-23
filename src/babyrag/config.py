@@ -90,6 +90,7 @@ class Settings:
     session_id: str = ""
     max_usd: float = 10.0
     variant: str = "original"
+    provider: str = "opencode"
 
     @property
     def paths(self) -> dict[str, Path]:
@@ -99,19 +100,36 @@ class Settings:
 def load_settings(env: dict[str, str] | None = None) -> Settings:
     load_dotenv(ROOT / ".env")
     e = os.environ if env is None else env
-    key = (e.get("OPENCODE_GO_API_KEY") or e.get("OPENCODE_API_KEY") or "").strip()
-    if not key:
-        raise ConfigError("OPENCODE_GO_API_KEY is not set (see .env.example)")
+    provider = (e.get("BABYRAG_LLM_PROVIDER") or "opencode").strip().lower()
+    silicon_key = (e.get("SILICONFLOW_API_KEY") or "").strip()
+    silicon_url = (e.get("SILICONFLOW_BASE_URL") or DEFAULT_SILICON_URL).strip()
     session = (e.get("OPENCODE_SESSION_ID") or "").strip() or f"ses_{uuid.uuid4().hex}"
+
+    if provider == "siliconflow":
+        if not silicon_key:
+            raise ConfigError("SILICONFLOW_API_KEY is not set (needed for --provider siliconflow)")
+        api_key = silicon_key
+        base_url = silicon_url
+        model = (e.get("BABYRAG_LLM_MODEL") or "Qwen/Qwen2.5-7B-Instruct").strip()
+    else:
+        provider = "opencode"
+        key = (e.get("OPENCODE_GO_API_KEY") or e.get("OPENCODE_API_KEY") or "").strip()
+        if not key:
+            raise ConfigError("OPENCODE_GO_API_KEY is not set (see .env.example)")
+        api_key = key
+        base_url = (e.get("OPENCODEGO_BASE_URL") or DEFAULT_BASE_URL).strip()
+        model = (e.get("OPENCODEGO_MODEL") or DEFAULT_MODEL).strip()
+
     return Settings(
-        api_key=key,
-        base_url=(e.get("OPENCODEGO_BASE_URL") or DEFAULT_BASE_URL).strip(),
-        model=(e.get("OPENCODEGO_MODEL") or DEFAULT_MODEL).strip(),
-        silicon_key=(e.get("SILICONFLOW_API_KEY") or "").strip(),
-        silicon_url=(e.get("SILICONFLOW_BASE_URL") or DEFAULT_SILICON_URL).strip(),
+        api_key=api_key,
+        base_url=base_url,
+        model=model,
+        silicon_key=silicon_key,
+        silicon_url=silicon_url,
         session_id=session,
         max_usd=float(e.get("BABYRAG_MAX_USD") or 10.0),
         variant=(e.get("BABYRAG_VARIANT") or "original").strip(),
+        provider=provider,
     )
 
 

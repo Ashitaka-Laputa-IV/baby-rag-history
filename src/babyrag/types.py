@@ -37,6 +37,7 @@ class Cost(TypedDict, total=False):
     cache_hits: int
     latency_ms: int
     usd: float
+    free: bool
 
 
 class Step(TypedDict, total=False):

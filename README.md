@@ -120,6 +120,10 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 > 橙色是 masked 变体，整条线比原题低约 20 分：标题泄漏对分数的贡献非常直观。
 > 纵轴从 40 开始，便于看差异。
 
+**弱模型对照**：把生成模型换成 SiliconFlow 免费的 `Qwen2.5-7B` 后，r0 掉到 63.0%、r7 掉到 63.0%，
+r5 仍有 88.9%；准确率差距从 11pp 拉到 26pp。也就是说，**强模型确实会掩盖检索链路的差异**。
+详见 [`docs/results.md`](docs/results.md)。
+
 **四个稳定结论**：
 
 - **r5 contextual** 赢 3/4 套；索引期补语境是这份语料上最有效的单点改动。

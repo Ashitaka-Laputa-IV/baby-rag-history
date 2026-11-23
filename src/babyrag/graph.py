@@ -239,7 +239,8 @@ class Runner:
         result = self.llm.invoke(GENERATE.format(question=state["question"], context=context),
                                  stage="generate", system=SYSTEM_GROUNDED)
         answer = result.text.strip()
-        abstain = answer.startswith("无法回答") and len(answer) < 20
+        # A refusal is a refusal even if the model appends an explanation.
+        abstain = answer.startswith("无法回答")
         return {"answer": answer, "abstain": abstain, "hits": kept,
                 "citations": extract_citations(answer, kept),
                 "cursor": state["cursor"] + 1,
@@ -254,8 +255,10 @@ class Runner:
 
     def finalize(self, state: RAGState) -> dict:
         records = state.get("node_records") or []
-        return {"cost": add_cost(records),
-                "trajectory": [{"node": "finalize", "detail": f"${add_cost(records)['usd']:.4f}"}]}
+        cost = add_cost(records)
+        cost["free"] = self.services.settings.provider == "siliconflow"
+        return {"cost": cost,
+                "trajectory": [{"node": "finalize", "detail": f"${cost['usd']:.4f}"}]}
 
 
 def build_graph(services: Services, llm: LLMClient):

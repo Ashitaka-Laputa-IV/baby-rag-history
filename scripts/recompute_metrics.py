@@ -29,6 +29,10 @@ RUNS = {
     "test": ("retrospective test split",
              "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。",
              False),
+    "siliconflow-qwen-qwen25-7b-instruct": (
+        "SiliconFlow Qwen/Qwen2.5-7B-Instruct",
+        "弱模型对照：Qwen/Qwen2.5-7B-Instruct（SiliconFlow 免费档）。30 道原题；成本按 $0 记录，不与 DeepSeek 主榜混算。",
+        False),
 }
 
 
@@ -72,6 +76,13 @@ def main() -> int:
         for row in rows:
             q = queries[row["qid"]]
             row["type"] = q.get("type", "")
+            if row.get("error"):
+                for key in ("correct", "abstain_correct", "doc@1", "doc_recall@5",
+                            "doc_recall_all@5", "context_precision@5",
+                            "chunk@1", "chunk@3", "chunk@5", "chunk_hit@5",
+                            "mrr@10", "ndcg@10", "citation_precision"):
+                    row[key] = None
+                continue
             evidence = q.get("evidence", "")
             gold = set(q.get("gold_doc_ids") or [])
             if q.get("should_abstain"):

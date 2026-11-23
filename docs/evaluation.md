@@ -44,6 +44,8 @@
   另外，chunk 文本去掉了标题，但 metadata 的 `title` 仍会由 `build_context` 拼回上下文，
   所以是**部分去偏**，不是完全去标题。
 - **judge 偏差**：单模型、单次判定；A/B 只检查位置偏差，不检查事实判断错误。
+- **弱模型对照的 judge 也是弱模型**：换 Qwen2.5-7B 时，判对错的也是它；只有 `evidence R@k` / MRR 是 judge 无关的。
+- **API 错误**：弱模型跑出现 5 条 451/400/503，已从分母剔除；leaderboard 的 `err` 列会显示。
 - **faithfulness 偏宽松**：30 条抽样里 29 条 `supported=1.0`，不能用来排名。
 - **公开锚点小**：25 题英文手册，r5/r6 没有公共索引。
 - **题库作者偏差**：25 道难题是项目作者手写的，可能偏向某些失败模式。
@@ -62,6 +64,9 @@ uv run python -m scripts.run_eval --rungs all --queries eval/queries-hard.jsonl 
 
 # 回顾性 test split
 uv run python -m scripts.run_eval --rungs all --queries eval/queries-test.jsonl --workers 3
+
+# 弱模型对照（SiliconFlow 免费 Qwen2.5-7B）
+uv run python -m scripts.run_eval --rungs all --provider siliconflow --workers 4
 
 # 公开锚点（先构建 25 题公共索引）
 uv run python -m scripts.build_public_benchmark
