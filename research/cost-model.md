@@ -1,5 +1,7 @@
 # RAG Demo 成本模型（可审计版）
 
+> **实现前研究，按 200 篇 / 150 题估算**；现状以 [`../docs/results.md`](../docs/results.md) 为准。
+
 - 生成日期：2026-11-20
 - 计价模型：DeepSeek V4.1 Flash（opencode-go 网关），输入 $0.15 / 1M tok，输出 $0.60 / 1M tok，缓存命中读 $0.003 / 1M tok
 - 语料与评测来源：`C:\Users\Ashit\Documents\GitHub\rag-ladder\data\manifest.json`、`manifest-chunks.json`、`eval\queries.jsonl`

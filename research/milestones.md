@@ -1,5 +1,7 @@
 # RAG 里程碑调研简报
 
+> **实现前研究，成本/规模数字已过期**；现状以 [`../docs/results.md`](../docs/results.md) 为准。
+
 > 目标：为一个 200 篇中文维基、869 个 chunk、约 37.5 万 token 的小语料，用 **一套 LangGraph 状态机** 演示 RAG 发展史中的 6–8 个里程碑。
 > 约束：DeepSeek V4.1 Flash（$0.15/M 输入、$0.60/M 输出），总 LLM 预算 **$10**；bge-m3 与 bge-reranker-v2-m3 在 SiliconFlow 免费；GraphRAG 因成本与复杂度排除。
 > 调研日期：2026-11-20。文中所有论文结论均给出链接；所有金额均为**估算**，不是账单。

@@ -1,5 +1,7 @@
 # rag-ladder 语料与评测集评估
 
+> **实现前研究，题库与语料规模已变化**；现状以 [`../docs/results.md`](../docs/results.md) 为准。
+
 > 评估对象：`C:\Users\Ashit\Documents\GitHub\rag-ladder`（只读，未改动任何文件）
 > 评估日期：2026-11-20
 > 数据口径：`chars` = Python `len(str)`；`tokens` = `cl100k_base`；文档 = 中文维基条目；切块 = 512 token / 64 overlap。

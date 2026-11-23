@@ -1,5 +1,7 @@
 # baby-rag-history 技术设计说明（LangGraph 单图多里程碑）
 
+> **实现前设计，部分 API/参数已变化**；现状以 [`../docs/design.md`](../docs/design.md) 为准。
+
 > 目标：在 **一个** LangGraph 状态机里演示 RAG 的 6+ 个历史里程碑；既能固定某一"台阶"做可复现评测（ladder），也能按问题自适应路由（adaptive）；总 LLM 预算 $10，所有可缓存产物必须缓存。
 >
 > 版本基准：LangGraph 1.2.x（当前 PyPI 为 1.2.24）、langchain-core 1.4.x、Python 3.12、uv。

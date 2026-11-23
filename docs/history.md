@@ -74,6 +74,6 @@
 
 ## 不实现的档
 
-- **GraphRAG**：成本上买得起（约 $1.11），但 1,000 篇语料上社区结构太薄、工程风险高。见 `graphrag-not-built.md`。
+- **GraphRAG**：成本上买得起（1,000 篇约 $3.5–6），但社区结构太薄、工程风险高。见 `graphrag-not-built.md`。
 - **ColBERT / 多向量**：工程复杂度与收益不匹配。
 - **微调 / 训练**：预算与时间不允许；DPR、Self-RAG 的 reflection token 都用同机制的现代替代。
