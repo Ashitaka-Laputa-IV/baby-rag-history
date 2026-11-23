@@ -25,36 +25,24 @@ CHROMA_DIR = DATA / "chroma"
 BM25_DIR = DATA / "bm25"
 
 
-@dataclass(frozen=True)
-class VariantLayout:
-    """One layout for every variant: a base directory plus two suffixes."""
-
-    base: Path
-    file_suffix: str = ""
-    collection_suffix: str = ""
-
-
-_VARIANT_LAYOUTS: dict[str, VariantLayout] = {
-    "original": VariantLayout(DATA),
-    "masked": VariantLayout(DATA, ".masked", "_masked"),
-    "public": VariantLayout(DATA / "public", "", "_public"),
-}
-
-
 def variant_paths(variant: str) -> dict[str, Path | str]:
     """Resolve file paths and Chroma collections for a corpus variant.
 
-    All variants follow the same shape, so adding one only needs a
-    VariantLayout entry rather than another hand-written dict.
+    The three variants share one layout; only the base directory and the two
+    suffixes differ.
     """
-    layout = _VARIANT_LAYOUTS.get(variant, _VARIANT_LAYOUTS["original"])
-    file_suffix = layout.file_suffix
-    collection_suffix = layout.collection_suffix
+    if variant == "masked":
+        base, file_suffix, collection_suffix = DATA, ".masked", "_masked"
+    elif variant == "public":
+        base, file_suffix, collection_suffix = DATA / "public", "", "_public"
+    else:
+        base, file_suffix, collection_suffix = DATA, "", ""
+
     return {
-        "corpus": layout.base / f"corpus{file_suffix}.jsonl",
-        "chunks": layout.base / f"chunks{file_suffix}.jsonl",
-        "contextual": layout.base / f"contextual{file_suffix}.jsonl",
-        "raptor": layout.base / f"raptor{file_suffix}.jsonl",
+        "corpus": base / f"corpus{file_suffix}.jsonl",
+        "chunks": base / f"chunks{file_suffix}.jsonl",
+        "contextual": base / f"contextual{file_suffix}.jsonl",
+        "raptor": base / f"raptor{file_suffix}.jsonl",
         "dense": f"chunks{collection_suffix}",
         "contextual_dense": f"contextual{collection_suffix}",
         "raptor_dense": f"raptor{collection_suffix}",

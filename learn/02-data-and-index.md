@@ -58,29 +58,23 @@ subject: 语料如何变成可检索的卡片
 | `masked` | 1,200 篇 / 5,676 张 | 把卡片里的标题替换成「（标题已隐藏）」，再加 200 篇“同姓/同类型”的干扰文章 |
 | `public` | 25 题 / 54 张 | 英文手册，外部对照 |
 
-切变体只需要改一个环境变量 `BABYRAG_VARIANT`，不用改代码。三种变体共用一套布局，
-只填三个参数：base 目录、文件后缀、collection 后缀。
+切变体只需要改一个环境变量 `BABYRAG_VARIANT`，不用改代码。三种变体只改三个变量，
+最后返回同一套字段：
 
 ```python
-@dataclass(frozen=True)
-class VariantLayout:
-    base: Path
-    file_suffix: str = ""            # corpus.masked.jsonl 的 ".masked"
-    collection_suffix: str = ""      # chunks_masked 的 "_masked"
-
-_VARIANT_LAYOUTS = {
-    "original": VariantLayout(DATA),
-    "masked": VariantLayout(DATA, ".masked", "_masked"),
-    "public": VariantLayout(DATA / "public", "", "_public"),
-}
-
 def variant_paths(variant):
-    layout = _VARIANT_LAYOUTS[variant]
+    if variant == "masked":
+        base, file_suffix, collection_suffix = DATA, ".masked", "_masked"
+    elif variant == "public":
+        base, file_suffix, collection_suffix = DATA / "public", "", "_public"
+    else:
+        base, file_suffix, collection_suffix = DATA, "", ""
+
     return {
-        "corpus": layout.base / f"corpus{layout.file_suffix}.jsonl",
-        "chunks": layout.base / f"chunks{layout.file_suffix}.jsonl",
+        "corpus": base / f"corpus{file_suffix}.jsonl",
+        "chunks": base / f"chunks{file_suffix}.jsonl",
         ...
-        "dense": f"chunks{layout.collection_suffix}",
+        "dense": f"chunks{collection_suffix}",
     }
 ```
 
@@ -170,8 +164,8 @@ CHUNK_OVERLAP = 64
 
 ## 想深入看代码
 
-- 路径与价格：[config.py:69](../src/babyrag/config.py#L69)
-- 三套索引的路径：[config.py:44](../src/babyrag/config.py#L44)
+- 路径与价格：[config.py:57](../src/babyrag/config.py#L57)
+- 三套索引的路径：[config.py:28](../src/babyrag/config.py#L28)
 - 卡片与状态：[types.py:9](../src/babyrag/types.py#L9)、[types.py:47](../src/babyrag/types.py#L47)
 - 切卡片：[scripts/build_chunks.py](../scripts/build_chunks.py)
 - 造 masked 语料：[scripts/build_masked_corpus.py](../scripts/build_masked_corpus.py)
