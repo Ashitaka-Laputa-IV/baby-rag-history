@@ -27,6 +27,13 @@ subject: 语义检索、关键词检索、RRF 融合、精排
 
 问“开姆尼茨工业大学”，它一定会找含这几个字的卡片；问“那所德国东部的工业大学”，它可能就找不到。
 
+它先用 jieba 把中文切成词：
+
+```python
+def tokenize(text):
+    return [t for t in jieba.lcut(text) if TOKEN_RE.search(t)]
+```
+
 ## 武器三：RRF（把两套排名投票合并）
 
 语义检索给一个排名，关键词检索给一个排名。两个排名怎么合？
@@ -37,6 +44,14 @@ subject: 语义检索、关键词检索、RRF 融合、精排
 
 排在前面的卡片得票多；两套都靠前的卡片最占优势。`60` 是一个平滑常数，让第 1 名和第 2 名的差距不要过于极端。
 
+代码里就是一次累加：
+
+```python
+for rank, hit in enumerate(hits, start=1):
+    cid = hit["chunk_id"]
+    scores[cid] = scores.get(cid, 0.0) + 1.0 / (k + rank)
+```
+
 ## 武器四：精排（rerank）
 
 前三种都是“快速粗筛”。精排是**把问题和卡片放在一起再读一遍**，重新打分。
@@ -46,8 +61,17 @@ subject: 语义检索、关键词检索、RRF 融合、精排
 一个比喻：
 
 - 语义/关键词检索 = 图书馆员按索引快速抱来 20 本书；
+
 - RRF = 把两个馆员的推荐合并；
 - rerank = 你自己坐下来，把 20 本书的目录认真读一遍，挑 5 本。
+
+代码里就是“问模型要新排名，再按下标取回原卡片”：
+
+```python
+pairs = rerank(settings, query, [h["text"] for h in hits], top_n=5)
+for index, score in pairs:
+    hit = dict(hits[index])   # index 是输入列表的下标
+```
 
 ## 四种武器怎么组合
 
@@ -80,6 +104,21 @@ r5 在索引阶段给每张卡片加一句定位说明，比如：
 r6 把卡片聚类，几段合成一段摘要；摘要再聚类，再摘要，形成两层小树。
 
 查资料时，**原始卡片和摘要卡片一起查**。这样既能拿到细节，也能拿到“全局在讲什么”。
+
+## 最后一步：拼上下文
+
+检索结束后，5 张卡片会被拼成带编号的资料。编号不是卡片自带的，是拼的时候临时加的：
+
+```python
+piece = f"[{len(kept) + 1}] （{title}）{body}"
+cost = services.count_tokens(piece)
+if used + cost > budget:
+    continue
+```
+
+- 编号从 1 开始，对应答案里的 `[1]`、`[2]`。
+- 超过 4,000 token 的卡片会被跳过，后面更小的卡片仍可能进来。
+- `title` 也会拼进去；masked 变体只去掉了正文里的标题，所以标题仍可能出现在这里。
 
 ## 一个反直觉的点
 

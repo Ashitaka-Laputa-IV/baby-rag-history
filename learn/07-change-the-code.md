@@ -41,8 +41,16 @@ uv run babyrag ask "开姆尼茨工业大学的前身创办于哪一年？" --ru
 
 现在写死了两处：
 
-- `retrieve_hybrid` 每次各取 10 条（[graph.py:52](../src/babyrag/graph.py#L52)）；
-- `generate` 只留前 5 条（[graph.py:232](../src/babyrag/graph.py#L232)）。
+```python
+# graph.py:52  retrieve_hybrid 各取 10
+dense = self.services.dense.search(query, k=10)
+bm25 = self.services.bm25.search(query, k=10)
+
+# graph.py:232  generate 只留 5
+hits = (state.get("hits") or [])[:5]
+```
+
+另外 `rerank` 里还有 `top_n=5`（[graph.py:118](../src/babyrag/graph.py#L118)）。
 
 想改成 top-3：
 
@@ -88,7 +96,14 @@ uv run babyrag ask "开姆尼茨工业大学的前身创办于哪一年？" --ru
 想真正去掉：
 
 1. 在 [build_masked_corpus.py](../scripts/build_masked_corpus.py) 里，把 masked 卡片的
-   `title` 也设为「（标题已隐藏）」。
+   `title` 也设为「（标题已隐藏）」。现在只改了正文：
+
+```python
+masked = dict(chunk)
+masked["text"] = mask_text(chunk["text"], chunk["title"])
+# 还缺一行：
+masked["title"] = "（标题已隐藏）"
+```
 2. 重建 `chunks.masked.jsonl`。
 3. 重建 `chunks_masked` 集合（embedding 免费）。
 4. 重跑 masked 评测，比较前后数字。

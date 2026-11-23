@@ -58,7 +58,16 @@ subject: 语料如何变成可检索的卡片
 | `masked` | 1,200 篇 / 5,676 张 | 把卡片里的标题替换成「（标题已隐藏）」，再加 200 篇“同姓/同类型”的干扰文章 |
 | `public` | 25 题 / 54 张 | 英文手册，外部对照 |
 
-切变体只需要改一个环境变量 `BABYRAG_VARIANT`，不用改代码。
+切变体只需要改一个环境变量 `BABYRAG_VARIANT`，不用改代码。代码里就是一个分支：
+
+```python
+def variant_paths(variant):
+    if variant == "masked":
+        return {"corpus": DATA / "corpus.masked.jsonl",
+                "chunks": DATA / "chunks.masked.jsonl",
+                "dense": "chunks_masked", ...}
+    return {"corpus": CORPUS, "chunks": CHUNKS, "dense": "chunks", ...}
+```
 
 > 注意：masked 只替换了卡片**正文**里的标题；卡片还带着原来的标题元数据，
 > 拼上下文时标题仍可能出现。所以它是“部分去标题”，不是完全去掉。
@@ -70,6 +79,65 @@ subject: 语料如何变成可检索的卡片
 1. **`Settings`**：路径、价格、模型名、当前用哪套索引。
 2. **`Chunk`**：一张卡片，有 `chunk_id`、`doc_id`、正文、分数、来源。
 3. **`RAGState`**：流程中不断更新的那张表，装着问题、候选卡片、答案、成本。
+
+`Chunk` 就是一张卡片：
+
+```python
+class Chunk(TypedDict, total=False):
+    chunk_id: str
+    doc_id: str
+    doc_ids: list[str]   # RAPTOR 摘要覆盖多个文档时用
+    title: str
+    text: str
+    score: float
+    rank: int
+    source: str          # dense | bm25 | rrf | rerank ...
+    level: int           # RAPTOR 层级
+```
+
+`RAGState` 就是那张“这一题现在到哪了”的表：
+
+```python
+class RAGState(TypedDict, total=False):
+    # 输入 / 计划
+    qid: str
+    question: str
+    mode: Literal["ladder", "adaptive"]
+    rung: str
+    plan: list[str]
+    cursor: int
+    route_reason: str
+    # 查询
+    qtype: str
+    query_variants: list[str]
+    # 检索
+    dense_hits: list[Chunk]
+    bm25_hits: list[Chunk]
+    multi_hits: list[list[Chunk]]
+    hits: list[Chunk]
+    # 生成
+    answer: str
+    citations: list[str]
+    # 控制
+    grade: Literal["correct", "ambiguous", "incorrect"]
+    retries: int
+    abstain: bool
+    # 观测
+    node_records: Annotated[list[NodeRecord], operator.add]
+    trajectory: Annotated[list[Step], operator.add]
+    cost: Cost
+    error: str | None
+```
+
+注意最后两行：`node_records` / `trajectory` 用了 `operator.add`，意思是“节点返回的列表要**追加**，不是覆盖”。
+
+路径和预算则来自 `Settings` / 常量：
+
+```python
+MAX_CONTEXT_TOKENS = 4000
+CHUNK_SIZE = 512
+CHUNK_OVERLAP = 64
+```
 
 你不需要背字段。只要记住：**`Settings` 管“在哪”，`Chunk` 管“一张卡片”，`RAGState` 管“这一题现在到哪了”。**
 

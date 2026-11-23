@@ -29,6 +29,16 @@ OpenCode Go 这个网关有一个特殊要求：每个请求都要带一个会�
 `x-opencode-session` 头里。没有它，网关直接返回 400，看起来像“请求有问题”，其实是缺工牌。
 
 程序在启动时生成一次 `ses_<随机>`，之后所有请求复用同一个。这样网关还能复用它那边的提示词缓存。
+构造模型时把工牌放进默认请求头：
+
+```python
+self._llm = ChatOpenAI(
+    model=settings.model,
+    base_url=settings.base_url,
+    api_key=settings.api_key,
+    default_headers={"x-opencode-session": settings.session_id},
+)
+```
 
 ## 缓存：一本“问答备忘录”
 
@@ -43,6 +53,15 @@ OpenCode Go 这个网关有一个特殊要求：每个请求都要带一个会�
 - 问过：直接把上次的回答拿出来，**花费 0**。
 - 没问过：真的调用模型，把回答和 token 数一起存进去。
 
+代码里就是先查、再决定：
+
+```python
+key = _key(stage, prompt_version, self.model, system or "", prompt, extra_key)
+hit = self.cache.get(key)
+if hit is not None:
+    return LLMResult(text=..., tokens_in=..., tokens_out=..., cached=True)  # usd=0
+```
+
 ```mermaid
 flowchart LR
   A[要调用] --> B[算指纹]
@@ -54,6 +73,12 @@ flowchart LR
 ```
 
 指纹包含“提示词版本”，所以改了提示词、把版本号从 `v1` 改成 `v2`，旧缓存会自动失效，不会拿旧答案。
+
+真正调用后，按 token 算钱：
+
+```python
+cost = tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ
+```
 
 ## 为什么缓存命中还要记 token
 
@@ -70,6 +95,15 @@ flowchart LR
 
 会重试的错误包括：429（限流）、500/502/503/504、超时、连接断开。
 不会重试的错误（比如参数写错）会立刻抛出。
+
+判断逻辑就是一段字符串匹配：
+
+```python
+retryable = any(s in text for s in (
+    "429", "Rate limit", "500", "502", "503", "504",
+    "timeout", "overloaded", "Connection error", "Connection",
+))
+```
 
 ## Embedding 和重排为什么免费
 

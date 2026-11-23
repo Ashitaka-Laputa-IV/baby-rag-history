@@ -36,14 +36,22 @@ subject: 一次 babyrag ask 的完整过程
 | `hits` | 空 |
 | `answer` | 空 |
 
-这张表会在整个流程里被不断更新。代码里叫 `RAGState`。
+这张表会在整个流程里被不断更新。代码里叫 `RAGState`。`run_one` 一开始只填必要字段：
+
+```python
+state = {
+    "qid": qid, "question": question, "rung": rung, "mode": mode,
+    "qtype": qtype, "retries": 0, "node_records": [], "trajectory": [],
+}
+```
 
 ## 第三步：看工序单
 
-如果你选的是 `r2_rerank`，工序单是：
+如果你选的是 `r2_rerank`，工序单就是 `RUNGS` 里的一行：
 
-```text
-retrieve_hybrid → fuse_rrf → rerank → generate
+```python
+RUNGS["r2_rerank"]
+# ["retrieve_hybrid", "fuse_rrf", "rerank", "generate"]
 ```
 
 用大白话：
@@ -86,6 +94,13 @@ retrieve_hybrid → fuse_rrf → rerank → generate
 
 > 开姆尼茨工业大学的前身创办于 1836 年。[1]
 
+生成前有两条硬规则，代码里就是这两行：
+
+```python
+hits = (state.get("hits") or [])[:5]          # 最多 5 张卡片
+context, kept = build_context(hits, ...)     # 按 4,000 token 截断
+```
+
 最后，程序把这次调用花了多少 token、多少钱、多少毫秒记下来。
 
 ## 为什么要有“工序单”和“工头”
@@ -111,6 +126,14 @@ flowchart LR
   dispatch -->|第 4 步| D[生成]
   D --> dispatch
   dispatch -->|单子走完| finalize --> END
+```
+
+工头判断下一步，只看三行：
+
+```python
+plan = state.get("plan") or []
+cursor = int(state.get("cursor", 0))
+return plan[cursor] if cursor < len(plan) else "finalize"
 ```
 
 这就是 LangGraph 在这里的全部作用：**把“下一步做什么”变成数据，而不是写死在代码里。**

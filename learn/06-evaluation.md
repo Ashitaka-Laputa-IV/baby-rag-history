@@ -36,6 +36,14 @@ subject: 评测指标、分母和置信区间
 - `evidence R@1`：正确答案的原文是不是第一张；
 - `evidence R@5`：有没有进最终上下文（生成器只看 5 张）。
 
+判断“这张卡片里有没有标准答案原文”，代码其实很朴素：
+
+```python
+def evidence_in(text, evidence):
+    a, b = norm(text), norm(evidence)
+    return b in a or (len(b) >= 12 and b[:12] in a)
+```
+
 多跳题还会看 `doc all@5`：**所有**相关文章都要进前 5，而不是“任意一个”。
 
 ## 一个曾经的错误：分母不一样
@@ -49,6 +57,17 @@ subject: 评测指标、分母和置信区间
 
 - 所有 rung 的 `可答 acc` 都只算 27 / 25 道可答题；
 - 所有 rung 都单独报 `弃答 acc`，不会弃答的 rung 得 0。
+
+代码里就是这一分支：
+
+```python
+if should_abstain:
+    out["correct"] = None          # 不进可答分母
+    out["abstain_correct"] = int(abstain)
+else:
+    out["abstain_correct"] = None
+    out["correct"] = judge(...)    # 或 0（弃答/空答案）
+```
 
 ## 置信区间：30 道题的 90 分不一定是真的 90 分
 
@@ -71,6 +90,12 @@ subject: 评测指标、分母和置信区间
 
 1. **A/B 对调**：同一道题，正常顺序判一次，把“回答”和“参考答案”位置对调再判一次；
    30 条抽样里 30/30 一致。
+
+```python
+first = llm.invoke(JUDGE.format(...), stage="judge")
+second = llm.invoke(JUDGE_SWAP.format(...), stage="judge_swap")
+agree = parse_score(first.text) == parse_score(second.text)
+```
 2. **人工抽检**：目前没有，这是已知缺口。
 
 ## 综合分是什么
@@ -87,6 +112,16 @@ subject: 评测指标、分母和置信区间
 - 30% 看第一张卡片对不对；
 - 20% 看排序质量；
 - 再按成本打一点折扣，避免“贵三倍但只好一点”的 rung 占便宜。
+
+代码只有三行：
+
+```python
+quality = (0.50 * entry["accuracy"]
+           + 0.30 * entry["chunk@1"]
+           + 0.20 * entry["mrr@10"])
+factor = 1 / (1 + 100 * entry["usd_cold_per_query"])
+entry["composite"] = round(100 * quality * factor, 1)
+```
 
 ## 结果怎么读
 

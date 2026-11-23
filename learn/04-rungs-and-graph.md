@@ -27,7 +27,21 @@ subject: RUNGS 计划表与 LangGraph 状态机
 | `r8_agentic` | 想 → 查 → 看，最多 4 轮 → 写答案 | 多轮检索 |
 | `adaptive` | 看题型，选上面某一张单子 | 不是新能力，是选路 |
 
-代码里就是 `RUNGS` 这个字典（[rungs.py:5](../src/babyrag/rungs.py#L5)）。字符串是节点名，顺序就是执行顺序。
+代码里就是 `RUNGS` 这个字典（[rungs.py:5](../src/babyrag/rungs.py#L5)）。字符串是节点名，顺序就是执行顺序：
+
+```python
+RUNGS = {
+    "r0_dense":       ["retrieve_dense", "generate"],
+    "r1_hybrid":      ["retrieve_hybrid", "fuse_rrf", "generate"],
+    "r2_rerank":      ["retrieve_hybrid", "fuse_rrf", "rerank", "generate"],
+    "r3_hyde":        ["hyde", "retrieve_hybrid", "fuse_rrf", "rerank", "generate"],
+    "r4_multiquery":  ["rewrite_multi_query", "retrieve_multi", "fuse_rrf", "rerank", "generate"],
+    "r5_contextual":  ["retrieve_contextual", "fuse_rrf", "rerank", "generate"],
+    "r6_raptor":      ["retrieve_raptor", "rerank", "generate"],
+    "r7_crag":        ["retrieve_hybrid", "fuse_rrf", "rerank", "grade", "generate"],
+    "r8_agentic":     ["agentic", "verify", "generate"],
+}
+```
 
 ## 一张图怎么跑九张单子
 
@@ -49,6 +63,20 @@ flowchart LR
 
 所以“新增一个 rung”通常只需要在 `RUNGS` 加一行；只有新增**节点**时才要改图。
 
+读单和派工的代码也很短：
+
+```python
+# plan：把工序单复制进 state
+if mode == "ladder":
+    plan = list(RUNGS[rung])
+else:
+    rung, reason = adaptive_plan(state["question"], state.get("qtype"))
+    plan = list(RUNGS[rung])
+
+# route：看 cursor 决定下一步
+return plan[cursor] if cursor < len(plan) else "finalize"
+```
+
 ## 走一遍 r2
 
 1. `plan` 读出 `["retrieve_hybrid", "fuse_rrf", "rerank", "generate"]`。
@@ -67,7 +95,18 @@ r7 在 `generate` 前多了一个 `grade`：
 - 如果明显不行，改写问题，再查一次；最多重查一次。
 - 如果模型输出“无法回答”，最后会计入弃答。
 
-这就是 CRAG 的核心：**先判断资料靠不靠谱，再决定答不答。**
+这就是 CRAG 的核心：**先判断资料靠不靠谱，再决定答不答。** 核心代码（省略了拼 prompt）：
+
+```python
+hits = (state.get("hits") or [])[:6]
+retries = int(state.get("retries", 0))
+result = self.llm.invoke(GRADE.format(question=..., chunks=...), stage="grade")
+relevant, verdict = parse_relevant(result.text, len(hits))
+if verdict == "incorrect" and retries < 1:
+    ...  # 改写查询 -> 重新检索 -> 重新精排
+if relevant:
+    hits = [hits[i - 1] for i in relevant if 1 <= i <= len(hits)]
+```
 
 ## 走一遍 r8
 
@@ -78,7 +117,19 @@ r8 把检索变成“工具”，让模型自己决定查什么：
 3. 模型看到结果，再决定继续查还是输出 `FINAL:`。
 4. 最多 4 轮。
 
-代价是慢：每次都要调用模型，而且历史越来越长。
+代价是慢：每次都要调用模型，而且历史越来越长。循环本体：
+
+```python
+for step in range(4):
+    result = self.llm.invoke(AGENTIC.format(question=..., history=...), stage="agentic")
+    if "FINAL:" in result.text:
+        break
+    query = result.text.split("SEARCH:", 1)[-1].strip()
+    hits = fuse_rrf(*self._hybrid(query), top_n=5)
+    for hit in hits:
+        collected.setdefault(hit["chunk_id"], hit)   # 不覆盖 baseline
+    history.append(f"SEARCH: {query}\nOBSERVATION: ...")
+```
 
 ## 一个容易误解的地方
 
