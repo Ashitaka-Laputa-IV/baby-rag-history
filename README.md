@@ -122,6 +122,9 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 
 **弱模型对照**：把生成模型换成 SiliconFlow 免费的 `Qwen2.5-7B` 后，r0 掉到 63.0%、r7 掉到 63.0%，
 r5 仍有 88.9%；准确率差距从 11pp 拉到 26pp。也就是说，**强模型确实会掩盖检索链路的差异**。
+
+![强模型 vs 弱模型综合分](docs/assets/weak-model.png)
+
 详见 [`docs/results.md`](docs/results.md)。
 
 **四个稳定结论**：
