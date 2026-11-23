@@ -118,7 +118,7 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 ![综合分折线图](docs/assets/composite-line.png)
 
 > 橙色是 masked 变体，整条线比原题低约 20 分：标题泄漏对分数的贡献非常直观。
-> 可下载 [SVG](docs/assets/composite-line.svg) 放大看。
+> 纵轴从 40 开始，便于看差异。
 
 **四个稳定结论**：
 
