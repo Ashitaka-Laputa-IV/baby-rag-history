@@ -3,10 +3,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.88,
     "doc_recall@5": 1,
     "chunk@1": 0.68,
+    "chunk@1_ci": [
+      0.48,
+      0.88
+    ],
+    "chunk@1_ci_wilson": [
+      0.4841,
+      0.828
+    ],
     "chunk@3": 0.92,
     "chunk@5": 0.96,
     "chunk_hit@5": 0.96,
@@ -22,6 +39,14 @@
     "tokens_in": 40999,
     "tokens_out": 3978,
     "llm_calls": 25,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8233,
     "cost_factor": 0.967,
     "composite": 79.6
@@ -30,10 +55,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.92,
     "doc_recall@5": 1,
     "chunk@1": 0.64,
+    "chunk@1_ci": [
+      0.44,
+      0.84
+    ],
+    "chunk@1_ci_wilson": [
+      0.4452,
+      0.7975
+    ],
     "chunk@3": 0.92,
     "chunk@5": 0.96,
     "chunk_hit@5": 0.96,
@@ -49,6 +91,14 @@
     "tokens_in": 40589,
     "tokens_out": 3771,
     "llm_calls": 23,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8073,
     "cost_factor": 0.9677,
     "composite": 78.1
@@ -57,10 +107,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.96,
     "doc_recall@5": 1,
     "chunk@1": 0.8,
+    "chunk@1_ci": [
+      0.6,
+      0.92
+    ],
+    "chunk@1_ci_wilson": [
+      0.6087,
+      0.9114
+    ],
     "chunk@3": 0.96,
     "chunk@5": 1,
     "chunk_hit@5": 1,
@@ -76,6 +143,14 @@
     "tokens_in": 41035,
     "tokens_out": 4821,
     "llm_calls": 25,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8763,
     "cost_factor": 0.9651,
     "composite": 84.6
@@ -84,10 +159,27 @@
     "n": 25,
     "correct": 22,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.88,
+    "accuracy_ci": [
+      0.72,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7004,
+      0.9583
+    ],
     "doc@1": 0.84,
     "doc_recall@5": 0.96,
     "chunk@1": 0.72,
+    "chunk@1_ci": [
+      0.52,
+      0.88
+    ],
+    "chunk@1_ci_wilson": [
+      0.5242,
+      0.8572
+    ],
     "chunk@3": 0.88,
     "chunk@5": 0.96,
     "chunk_hit@5": 0.96,
@@ -103,6 +195,14 @@
     "tokens_in": 43113,
     "tokens_out": 28775,
     "llm_calls": 32,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8165,
     "cost_factor": 0.9133,
     "composite": 74.6
@@ -111,10 +211,27 @@
     "n": 25,
     "correct": 24,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.96,
+    "accuracy_ci": [
+      0.88,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8046,
+      0.9929
+    ],
     "doc@1": 0.96,
     "doc_recall@5": 1,
     "chunk@1": 0.84,
+    "chunk@1_ci": [
+      0.68,
+      0.96
+    ],
+    "chunk@1_ci_wilson": [
+      0.6535,
+      0.936
+    ],
     "chunk@3": 1,
     "chunk@5": 1,
     "chunk_hit@5": 1,
@@ -130,6 +247,14 @@
     "tokens_in": 43217,
     "tokens_out": 11720,
     "llm_calls": 43,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.9147,
     "cost_factor": 0.9487,
     "composite": 86.8
@@ -138,10 +263,27 @@
     "n": 25,
     "correct": 24,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.96,
+    "accuracy_ci": [
+      0.88,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8046,
+      0.9929
+    ],
     "doc@1": 0.96,
     "doc_recall@5": 1,
     "chunk@1": 0.84,
+    "chunk@1_ci": [
+      0.68,
+      0.96
+    ],
+    "chunk@1_ci_wilson": [
+      0.6535,
+      0.936
+    ],
     "chunk@3": 0.96,
     "chunk@5": 1,
     "chunk_hit@5": 1,
@@ -157,6 +299,14 @@
     "tokens_in": 42039,
     "tokens_out": 4076,
     "llm_calls": 25,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.9123,
     "cost_factor": 0.9662,
     "composite": 88.1
@@ -165,10 +315,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.96,
     "doc_recall@5": 1,
     "chunk@1": 0.8,
+    "chunk@1_ci": [
+      0.64,
+      0.96
+    ],
+    "chunk@1_ci_wilson": [
+      0.6087,
+      0.9114
+    ],
     "chunk@3": 0.96,
     "chunk@5": 1,
     "chunk_hit@5": 1,
@@ -184,6 +351,14 @@
     "tokens_in": 40769,
     "tokens_out": 4816,
     "llm_calls": 11,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8763,
     "cost_factor": 0.9653,
     "composite": 84.6
@@ -192,10 +367,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.96,
     "doc_recall@5": 1,
     "chunk@1": 0.84,
+    "chunk@1_ci": [
+      0.68,
+      0.96
+    ],
+    "chunk@1_ci_wilson": [
+      0.6535,
+      0.936
+    ],
     "chunk@3": 0.96,
     "chunk@5": 1,
     "chunk_hit@5": 1,
@@ -211,6 +403,14 @@
     "tokens_in": 61738,
     "tokens_out": 17307,
     "llm_calls": 42,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8923,
     "cost_factor": 0.9271,
     "composite": 82.7
@@ -219,10 +419,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.92,
     "doc_recall@5": 1,
     "chunk@1": 0.64,
+    "chunk@1_ci": [
+      0.48,
+      0.84
+    ],
+    "chunk@1_ci_wilson": [
+      0.4452,
+      0.7975
+    ],
     "chunk@3": 0.92,
     "chunk@5": 0.96,
     "chunk_hit@5": 0.96,
@@ -238,6 +455,14 @@
     "tokens_in": 56426,
     "tokens_out": 27065,
     "llm_calls": 50,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8073,
     "cost_factor": 0.9101,
     "composite": 73.5
@@ -246,10 +471,27 @@
     "n": 25,
     "correct": 23,
     "correct_n": 25,
+    "abstain_n": 0,
     "accuracy": 0.92,
+    "accuracy_ci": [
+      0.8,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7503,
+      0.9778
+    ],
     "doc@1": 0.92,
     "doc_recall@5": 1,
     "chunk@1": 0.64,
+    "chunk@1_ci": [
+      0.44,
+      0.8
+    ],
+    "chunk@1_ci_wilson": [
+      0.4452,
+      0.7975
+    ],
     "chunk@3": 0.92,
     "chunk@5": 0.96,
     "chunk_hit@5": 0.96,
@@ -265,6 +507,14 @@
     "tokens_in": 40589,
     "tokens_out": 3771,
     "llm_calls": 0,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
     "quality": 0.8073,
     "cost_factor": 0.9677,
     "composite": 78.1

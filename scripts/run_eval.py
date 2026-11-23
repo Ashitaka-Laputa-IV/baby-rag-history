@@ -23,14 +23,23 @@ def main() -> int:
     chosen = ALL_RUNGS if args.rungs == "all" else [r.strip() for r in args.rungs.split(",")]
     queries_path = Path(args.queries) if args.queries else None
     hard = queries_path is not None and "hard" in queries_path.name
+    test = queries_path is not None and "test" in queries_path.name
     run_name = None
-    if args.variant == "masked" or hard:
-        run_name = args.variant if not hard else (f"{args.variant}-hard" if args.variant == "masked" else "hard")
+    if args.variant == "masked" or hard or test:
+        if test:
+            run_name = "test"
+        elif hard:
+            run_name = f"{args.variant}-hard" if args.variant == "masked" else "hard"
+        else:
+            run_name = args.variant
     settings = load_settings()
     rows = evaluate(settings, rungs=chosen, limit=args.limit, workers=args.workers,
                     queries_path=queries_path, run_name=run_name)
     summary = summarize(rows)
-    if hard:
+    if test:
+        label = "retrospective test split"
+        note = "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。"
+    elif hard:
         label = "masked + hard questions" if args.variant == "masked" else "hard questions"
         note = "29 道手写难题：避开文档标题，保留年份/地区/职业等限定词；每题 evidence 已校验落在 gold 文档内。"
     elif args.variant == "masked":

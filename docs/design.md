@@ -402,9 +402,9 @@ key = sha256(stage | prompt_version | model | normalized_input)
 | r4 Multi-query | 92.6% | 96.3% | N/A | $0.00046 |
 | r5 Contextual | **100.0%** | **100.0%** | N/A | $0.00031 |
 | r6 RAPTOR | 96.3% | 96.3% | N/A | $0.00030 |
-| r7 CRAG | 93.3% | 92.6% | **100.0%** | $0.00065 |
-| r8 Agentic | 90.0% | 96.3% | **100.0%** | $0.00086 |
-| adaptive | 90.0% | 96.3% | **100.0%** | $0.00045 |
+| r7 CRAG | 92.6% | 92.6% | **100.0%** | $0.00065 |
+| r8 Agentic | 88.9% | 96.3% | **100.0%** | $0.00086 |
+| adaptive | 88.9% | 96.3% | **100.0%** | $0.00045 |
 
 结论：**r5 contextual 与 r2 rerank 是本期真正的赢家**；HyDE/multi-query 在中文维基上没有增益；
 GraphRAG 的排除不影响上述结论（RAPTOR 已覆盖全局题）。`doc recall@5` 在 1,000 篇上仍为 100%，
@@ -431,6 +431,10 @@ GraphRAG 的排除不影响上述结论（RAPTOR 已覆盖全局题）。`doc re
 **教训**：doc R@5 是饱和指标；真正的区分度在 chunk@1/MRR。r2 rerank 稳定高性价比，r5 contextual 稳定靠前，
 r3 HyDE 在中文维基上会反噬，r8 agentic 的优势只在原题的多轮检索上出现。
 
-**综合分**：`100 × (0.50×acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`。
+**综合分**：`100 × (0.50×可答 acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)`。
 权重是 50/30/20，成本项只做温和惩罚，避免贵 3 倍的档在平手时胜出。结果：r5 contextual 赢 3/4 套，
 r4 multi-query 赢「难题 + masked」，r2 rerank 稳定前三；r3 HyDE 与 r8 agentic 综合分偏低。
+
+**评测协议 v2**：`可答 acc` 与 `弃答 acc` 分母分离（所有 rung 同一可答分母 27/25）；
+比例指标报 Wilson 95% CI（bootstrap 仍在 `summary.json`）；judge 做 30 条 A/B 字段对调校准（30/30 一致，
+15 个唯一问题，仍非人工标注）；20 道 dev / 10 道回顾性 test split，test 结果单独放 `results/test/`。

@@ -66,6 +66,16 @@ JUDGE = """你是严格的评测员。判断【回答】是否与【参考答案
 回答：{answer}
 """
 
+# Same rubric, reversed field order: used to detect position bias.
+JUDGE_SWAP = """你是严格的评测员。判断【回答】是否与【参考答案】一致，且没有编造。
+只输出 JSON：{{"score": 1, "reason": "..."}}。score=1 表示正确，0 表示错误或拒答错误。
+允许措辞不同；只比较事实。
+
+问题：{question}
+回答：{answer}
+参考答案：{gold}
+"""
+
 
 def parse_relevant(text: str, n: int) -> tuple[list[int], str]:
     match = re.search(r"\{.*?\}", text, re.S)

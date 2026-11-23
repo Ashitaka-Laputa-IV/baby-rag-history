@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import math
+import random
 import statistics
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -11,7 +13,7 @@ from pathlib import Path
 from .config import (EVAL, PRICE_INPUT, PRICE_OUTPUT, QUERIES, RESULTS, Settings)
 from .graph import build_graph, run_one
 from .llm import LLMClient
-from .prompts import JUDGE, parse_score
+from .prompts import JUDGE, JUDGE_SWAP, parse_score
 from .retrieval import Services
 from .rungs import ALL_RUNGS, LABELS
 from .types import add_cost
@@ -50,6 +52,18 @@ def judge(settings: Settings, question: str, gold: str, answer: str) -> int:
     result = llm.invoke(JUDGE.format(question=question, gold=gold, answer=answer),
                         stage="judge", system="你是严格但公正的评测员。")
     return parse_score(result.text)
+
+
+def judge_ab(settings: Settings, question: str, gold: str, answer: str) -> tuple[int, int, bool]:
+    """Two judgments with the answer/gold fields reversed; agreement is a
+    cheap position-bias check, not a replacement for human calibration."""
+    services, llm, _ = _env(settings)
+    first = llm.invoke(JUDGE.format(question=question, gold=gold, answer=answer),
+                       stage="judge", system="你是严格但公正的评测员。")
+    second = llm.invoke(JUDGE_SWAP.format(question=question, gold=gold, answer=answer),
+                        stage="judge_swap", system="你是严格但公正的评测员。")
+    a, b = parse_score(first.text), parse_score(second.text)
+    return a, b, a == b
 
 
 def evaluate(settings: Settings, *, rungs: list[str] | None = None,
@@ -109,8 +123,16 @@ def _score(settings: Settings, q: dict, result: dict) -> dict:
         out[f"doc_recall@{k}"] = int(any(gold_docs & ids for ids in doc_ids[:k])) if gold_docs else None
 
     doc_rank = next((i for i, ids in enumerate(doc_ids, start=1) if gold_docs & ids), None) if gold_docs else None
-    chunk_rank = next((i for i, h in enumerate(hits, start=1)
-                       if evidence_in(h.get("text", ""), evidence)), None) if evidence else None
+
+    def relevant(h: dict) -> bool:
+        # RAPTOR summary nodes are legitimate abstractions: count them as a
+        # retrieval hit when the summary covers a gold document, instead of
+        # requiring the raw evidence string inside the summary.
+        if str(h.get("chunk_id", "")).startswith("raptor:"):
+            return bool(gold_docs & set(h.get("doc_ids") or []))
+        return evidence_in(h.get("text", ""), evidence)
+
+    chunk_rank = next((i for i, h in enumerate(hits, start=1) if relevant(h)), None) if evidence else None
     out["doc@1"] = int(doc_rank == 1) if doc_rank else (0 if gold_docs else None)
     out["chunk@1"] = int(chunk_rank == 1) if evidence else None
     out["chunk@3"] = int(chunk_rank is not None and chunk_rank <= 3) if evidence else None
@@ -124,18 +146,22 @@ def _score(settings: Settings, q: dict, result: dict) -> dict:
     )
     should_abstain = bool(q.get("should_abstain"))
     abstain = bool(result.get("abstain"))
-    can_abstain = result.get("rung") in {"r7_crag", "r8_agentic", "adaptive"}
     if should_abstain:
-        # A rung without an abstain path is N/A here, not 0.
-        out["correct"] = int(abstain) if can_abstain else None
-    elif abstain or not result.get("answer"):
-        out["correct"] = 0
+        # No-answer questions never enter the answerable accuracy denominator.
+        # Every rung is scored on abstention, including rungs that cannot abstain
+        # (they score 0 there, which is the honest number).
+        out["correct"] = None
+        out["abstain_correct"] = int(abstain)
     else:
-        try:
-            out["correct"] = judge(settings, q["question"], q.get("gold_answer", ""),
-                                   result.get("answer", ""))
-        except Exception:
-            out["correct"] = None
+        out["abstain_correct"] = None
+        if abstain or not result.get("answer"):
+            out["correct"] = 0
+        else:
+            try:
+                out["correct"] = judge(settings, q["question"], q.get("gold_answer", ""),
+                                       result.get("answer", ""))
+            except Exception:
+                out["correct"] = None
     return out
 
 
@@ -152,10 +178,17 @@ def summarize(rows: list[dict]) -> dict:
             "n": len(items),
             "correct": sum(correct),
             "correct_n": len(correct),
+            "abstain_n": sum(1 for r in items if r.get("abstain_correct") is not None),
             "accuracy": round(sum(correct) / len(correct), 4) if correct else None,
+            "accuracy_ci": _bootstrap_ci([float(x) for x in correct]),
+            "accuracy_ci_wilson": _wilson_ci([float(x) for x in correct]),
             "doc@1": _mean(items, "doc@1"),
             "doc_recall@5": _mean(items, "doc_recall@5"),
             "chunk@1": _mean(items, "chunk@1"),
+            "chunk@1_ci": _bootstrap_ci([float(r["chunk@1"]) for r in items
+                                         if r.get("chunk@1") is not None]),
+            "chunk@1_ci_wilson": _wilson_ci([float(r["chunk@1"]) for r in items
+                                             if r.get("chunk@1") is not None]),
             "chunk@3": _mean(items, "chunk@3"),
             "chunk@5": _mean(items, "chunk@5"),
             "chunk_hit@5": _mean(items, "chunk@5"),
@@ -179,8 +212,13 @@ def summarize(rows: list[dict]) -> dict:
             "llm_calls": sum(int(r.get("cost", {}).get("llm_calls", 0)) for r in items),
         }
         entry = out[rung]
-        # Composite: 50% answer accuracy, 30% first-hit retrieval, 20% ranking,
-        # with a mild cost penalty so a 3x-expensive rung cannot win a tie.
+        entry["abstain_ci"] = _bootstrap_ci([float(r["abstain_correct"]) for r in items
+                                             if r.get("abstain_correct") is not None])
+        entry["abstain_ci_wilson"] = _wilson_ci([float(r["abstain_correct"]) for r in items
+                                                 if r.get("abstain_correct") is not None])
+        # Composite: 50% answerable-question accuracy, 30% first-hit retrieval,
+        # 20% ranking, with a mild cost penalty so a 3x-expensive rung cannot
+        # win a tie. Abstention is reported separately, not folded in.
         quality = (0.50 * (entry["accuracy"] or 0.0)
                    + 0.30 * (entry["chunk@1"] or 0.0)
                    + 0.20 * (entry["mrr@10"] or 0.0))
@@ -197,12 +235,30 @@ def _mean(items: list[dict], key: str) -> float | None:
 
 
 def _abstain_accuracy(items: list[dict]) -> float | None:
-    if not items or items[0].get("rung") not in {"r7_crag", "r8_agentic", "adaptive"}:
-        return None
-    subset = [r for r in items if r.get("type") == "none"]
-    if not subset:
-        return None
-    return round(sum(int(r.get("abstain", False)) for r in subset) / len(subset), 4)
+    values = [r["abstain_correct"] for r in items if r.get("abstain_correct") is not None]
+    return round(statistics.mean(values), 4) if values else None
+
+
+def _bootstrap_ci(values: list[float], *, n: int = 1000, seed: int = 42) -> tuple[float | None, float | None]:
+    """Percentile bootstrap 95% CI; deterministic for a fixed seed."""
+    if len(values) < 2:
+        return (None, None)
+    rng = random.Random(seed)
+    means = sorted(statistics.mean(rng.choices(values, k=len(values))) for _ in range(n))
+    return (round(means[int(0.025 * n)], 4), round(means[int(0.975 * n) - 1], 4))
+
+
+def _wilson_ci(values: list[float]) -> tuple[float | None, float | None]:
+    """Wilson score 95% CI for a proportion; stable at 0/0 and n/n."""
+    n = len(values)
+    if n == 0:
+        return (None, None)
+    p = sum(values) / n
+    z = 1.96
+    den = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / den
+    margin = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
+    return (round(max(0.0, center - margin), 4), round(min(1.0, center + margin), 4))
 
 
 def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
@@ -219,26 +275,39 @@ def write_reports(rows: list[dict], summary: dict, *, out_dir: Path = RESULTS,
 
     lines = [f"# baby-rag-history · {run_label}", "",
              "同一语料、同一批问题；`N/A` 表示该档不具备该能力，不是 0 分。", "",
-             "| rung | 里程碑 | 综合 | acc | doc@1 | chunk@1 | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | abstain | cold $/q | p50 | p95 |",
-             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+             "| rung | 里程碑 | 综合 | 可答 acc (95% CI) | 弃答 acc (95% CI) | doc@1 | chunk@1 (95% CI) | chunk@3 | chunk@5 | MRR@10 | nDCG@10 | cold $/q | p50 | p95 |",
+             "|---|---|---:|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
     for rung, s in summary.items():
         def fmt(v, pct=False):
             if v is None:
                 return "N/A"
             return f"{v * 100:.1f}%" if pct else str(v)
+
+        def with_ci(v, pair, pct=True):
+            base = fmt(v, pct)
+            if pair is None or pair[0] is None:
+                return base
+            if pct:
+                return f"{base} [{pair[0] * 100:.0f}–{pair[1] * 100:.0f}]"
+            return f"{base} [{pair[0]:.2f}–{pair[1]:.2f}]"
+
         lines.append(
             f"| `{rung}` | {LABELS.get(rung, rung)} | **{s.get('composite', 0):.1f}** | "
-            f"{fmt(s['accuracy'], True)} | "
-            f"{fmt(s['doc@1'], True)} | {fmt(s['chunk@1'], True)} | {fmt(s['chunk@3'], True)} | "
+            f"{with_ci(s['accuracy'], s.get('accuracy_ci_wilson'), True)} | "
+            f"{with_ci(s['abstain_accuracy'], s.get('abstain_ci_wilson'), True)} | "
+            f"{fmt(s['doc@1'], True)} | {with_ci(s['chunk@1'], s.get('chunk@1_ci_wilson'), True)} | "
+            f"{fmt(s['chunk@3'], True)} | "
             f"{fmt(s['chunk@5'], True)} | {fmt(s['mrr@10'])} | {fmt(s['ndcg@10'])} | "
-            f"{fmt(s['abstain_accuracy'], True)} | ${s['usd_cold_per_query']:.5f} | "
+            f"${s['usd_cold_per_query']:.5f} | "
             f"{s['p50_ms']}ms | {s['p95_ms']}ms |")
     note = dataset_note or ("评测集 30 题（single 12 / entity 6 / multi 6 / global 3 / none 3）；"
                             "1,000 篇 / 4,740 chunks。")
     lines += ["", "## 说明", "",
               f"- {note}",
-              "- `cold $/q` 按本次记录的 token × 单价计算，不受缓存影响；`本次实付` 是实际账单。",
-              "- 综合分 = 100 × (0.50×acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。",
+              "- `可答 acc` 只算可回答问题（所有 rung 同一分母）；`弃答 acc` 只算无答案题，所有 rung 都报。",
+              "- 方括号是 Wilson 95% 置信区间（小样本比例比 bootstrap 更稳）；bootstrap 结果仍在 `summary.json`。",
+              "- 综合分 = 100 × (0.50×可答 acc + 0.30×chunk@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。",
+              "- RAPTOR 摘要节点按「覆盖 gold 文档」算命中，不要求摘要逐字包含 evidence。",
               "- `chunk@1` / `MRR@10` 是主指标；`doc R@5` 在原始语料上会饱和。",
               "- 成本逐条见 `results/cost.jsonl`。"]
     (out_dir / "leaderboard.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

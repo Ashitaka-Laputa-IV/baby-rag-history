@@ -3,16 +3,33 @@
     "n": 30,
     "correct": 24,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.8889,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.7407,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7194,
+      0.9615
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.7407,
+    "chunk@1_ci": [
+      0.5926,
+      0.8889
+    ],
+    "chunk@1_ci_wilson": [
+      0.5532,
+      0.8683
+    ],
     "chunk@3": 0.8889,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7467,
     "ndcg@10": 0.7766,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.001439,
     "usd_per_query": 4.8e-05,
     "usd_cold_total": 0.009083,
@@ -22,6 +39,14 @@
     "tokens_in": 42529,
     "tokens_out": 4506,
     "llm_calls": 5,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.816,
     "cost_factor": 0.9706,
     "composite": 79.2
@@ -30,16 +55,33 @@
     "n": 30,
     "correct": 24,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.8889,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.7407,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7194,
+      0.9615
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.7778,
+    "chunk@1_ci": [
+      0.6296,
+      0.9259
+    ],
+    "chunk@1_ci_wilson": [
+      0.5924,
+      0.8939
+    ],
     "chunk@3": 0.9259,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7622,
     "ndcg@10": 0.7883,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.0,
     "usd_per_query": 0.0,
     "usd_cold_total": 0.009068,
@@ -49,6 +91,14 @@
     "tokens_in": 42167,
     "tokens_out": 4572,
     "llm_calls": 0,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.8302,
     "cost_factor": 0.9707,
     "composite": 80.6
@@ -57,16 +107,33 @@
     "n": 30,
     "correct": 26,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.963,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.8889,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8172,
+      0.9934
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.7778,
+    "chunk@1_ci": [
+      0.6296,
+      0.9259
+    ],
+    "chunk@1_ci_wilson": [
+      0.5924,
+      0.8939
+    ],
     "chunk@3": 0.963,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7833,
     "ndcg@10": 0.8052,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.0,
     "usd_per_query": 0.0,
     "usd_cold_total": 0.008946,
@@ -76,6 +143,14 @@
     "tokens_in": 42647,
     "tokens_out": 4249,
     "llm_calls": 0,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.8715,
     "cost_factor": 0.9711,
     "composite": 84.6
@@ -84,16 +159,33 @@
     "n": 30,
     "correct": 26,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.963,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.8889,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8172,
+      0.9934
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.4815,
+    "chunk@1_ci": [
+      0.2963,
+      0.6667
+    ],
+    "chunk@1_ci_wilson": [
+      0.3074,
+      0.6601
+    ],
     "chunk@3": 0.8889,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.6278,
     "ndcg@10": 0.689,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.000507,
     "usd_per_query": 1.7e-05,
     "usd_cold_total": 0.024352,
@@ -103,6 +195,14 @@
     "tokens_in": 45286,
     "tokens_out": 29266,
     "llm_calls": 2,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.7515,
     "cost_factor": 0.9249,
     "composite": 69.5
@@ -111,16 +211,33 @@
     "n": 30,
     "correct": 25,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.9259,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.8148,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7663,
+      0.9794
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.8148,
+    "chunk@1_ci": [
+      0.6667,
+      0.963
+    ],
+    "chunk@1_ci_wilson": [
+      0.633,
+      0.9182
+    ],
     "chunk@3": 0.963,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7889,
     "ndcg@10": 0.8087,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 0.6667,
     "usd_total": 0.00074,
     "usd_per_query": 2.5e-05,
     "usd_cold_total": 0.013887,
@@ -130,6 +247,14 @@
     "tokens_in": 44567,
     "tokens_out": 12004,
     "llm_calls": 2,
+    "abstain_ci": [
+      0.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.2077,
+      0.9385
+    ],
     "quality": 0.8652,
     "cost_factor": 0.9557,
     "composite": 82.7
@@ -138,16 +263,33 @@
     "n": 30,
     "correct": 27,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 1.0,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      1.0,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8754,
+      1.0
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.8519,
+    "chunk@1_ci": [
+      0.7037,
+      0.963
+    ],
+    "chunk@1_ci_wilson": [
+      0.6752,
+      0.9408
+    ],
     "chunk@3": 1,
     "chunk@5": 1,
     "chunk_hit@5": 1,
     "mrr@10": 0.8333,
     "ndcg@10": 0.8508,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.000334,
     "usd_per_query": 1.1e-05,
     "usd_cold_total": 0.009206,
@@ -157,6 +299,14 @@
     "tokens_in": 42798,
     "tokens_out": 4644,
     "llm_calls": 1,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.9222,
     "cost_factor": 0.9702,
     "composite": 89.5
@@ -165,16 +315,33 @@
     "n": 30,
     "correct": 26,
     "correct_n": 27,
+    "abstain_n": 3,
     "accuracy": 0.963,
-    "doc@1": 0.9,
+    "accuracy_ci": [
+      0.8889,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.8172,
+      0.9934
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.8148,
+    "chunk@1_ci": [
+      0.6667,
+      0.963
+    ],
+    "chunk@1_ci_wilson": [
+      0.633,
+      0.9182
+    ],
     "chunk@3": 0.963,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.8,
     "ndcg@10": 0.8175,
-    "abstain_accuracy": null,
+    "abstain_accuracy": 1,
     "usd_total": 0.0,
     "usd_per_query": 0.0,
     "usd_cold_total": 0.009022,
@@ -184,24 +351,49 @@
     "tokens_in": 42189,
     "tokens_out": 4489,
     "llm_calls": 0,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
     "quality": 0.8859,
     "cost_factor": 0.9708,
     "composite": 86.0
   },
   "r7_crag": {
     "n": 30,
-    "correct": 28,
-    "correct_n": 30,
-    "accuracy": 0.9333,
-    "doc@1": 0.9,
+    "correct": 25,
+    "correct_n": 27,
+    "abstain_n": 3,
+    "accuracy": 0.9259,
+    "accuracy_ci": [
+      0.8148,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7663,
+      0.9794
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.8148,
+    "chunk@1_ci": [
+      0.6296,
+      0.963
+    ],
+    "chunk@1_ci_wilson": [
+      0.633,
+      0.9182
+    ],
     "chunk@3": 0.9259,
     "chunk@5": 0.9259,
     "chunk_hit@5": 0.9259,
     "mrr@10": 0.7833,
     "ndcg@10": 0.7964,
-    "abstain_accuracy": 1.0,
+    "abstain_accuracy": 1,
     "usd_total": 0.000639,
     "usd_per_query": 2.1e-05,
     "usd_cold_total": 0.019489,
@@ -211,24 +403,49 @@
     "tokens_in": 62774,
     "tokens_out": 16788,
     "llm_calls": 2,
-    "quality": 0.8678,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
+    "quality": 0.864,
     "cost_factor": 0.939,
-    "composite": 81.5
+    "composite": 81.1
   },
   "r8_agentic": {
     "n": 30,
-    "correct": 27,
-    "correct_n": 30,
-    "accuracy": 0.9,
-    "doc@1": 0.9,
+    "correct": 24,
+    "correct_n": 27,
+    "abstain_n": 3,
+    "accuracy": 0.8889,
+    "accuracy_ci": [
+      0.7407,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7194,
+      0.9615
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.7778,
+    "chunk@1_ci": [
+      0.5926,
+      0.9259
+    ],
+    "chunk@1_ci_wilson": [
+      0.5924,
+      0.8939
+    ],
     "chunk@3": 0.9259,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7622,
     "ndcg@10": 0.7883,
-    "abstain_accuracy": 1.0,
+    "abstain_accuracy": 1,
     "usd_total": 0.0,
     "usd_per_query": 0.0,
     "usd_cold_total": 0.025743,
@@ -238,24 +455,49 @@
     "tokens_in": 63609,
     "tokens_out": 27003,
     "llm_calls": 0,
-    "quality": 0.8358,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
+    "quality": 0.8302,
     "cost_factor": 0.921,
-    "composite": 77.0
+    "composite": 76.5
   },
   "adaptive": {
     "n": 30,
-    "correct": 27,
-    "correct_n": 30,
-    "accuracy": 0.9,
-    "doc@1": 0.9,
+    "correct": 24,
+    "correct_n": 27,
+    "abstain_n": 3,
+    "accuracy": 0.8889,
+    "accuracy_ci": [
+      0.7778,
+      1.0
+    ],
+    "accuracy_ci_wilson": [
+      0.7194,
+      0.9615
+    ],
+    "doc@1": 1,
     "doc_recall@5": 1,
     "chunk@1": 0.8148,
+    "chunk@1_ci": [
+      0.6667,
+      0.963
+    ],
+    "chunk@1_ci_wilson": [
+      0.633,
+      0.9182
+    ],
     "chunk@3": 0.963,
     "chunk@5": 0.963,
     "chunk_hit@5": 0.963,
     "mrr@10": 0.7944,
     "ndcg@10": 0.8131,
-    "abstain_accuracy": 1.0,
+    "abstain_accuracy": 1,
     "usd_total": 0.000155,
     "usd_per_query": 5e-06,
     "usd_cold_total": 0.013492,
@@ -265,8 +507,16 @@
     "tokens_in": 48953,
     "tokens_out": 10249,
     "llm_calls": 1,
-    "quality": 0.8533,
+    "abstain_ci": [
+      1.0,
+      1.0
+    ],
+    "abstain_ci_wilson": [
+      0.4385,
+      1.0
+    ],
+    "quality": 0.8478,
     "cost_factor": 0.9569,
-    "composite": 81.7
+    "composite": 81.1
   }
 }
