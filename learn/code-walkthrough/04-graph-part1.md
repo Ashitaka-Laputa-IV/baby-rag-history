@@ -241,8 +241,8 @@ variants = [state["question"]] + parse_queries(result.text, 3)
 return {"query_variants": variants, ...}
 ```
 
-`parse_queries`（[`prompts.py:122`](../../src/babyrag/prompts.py#L122)）去掉行首符号，
-最多 3 条改写。
+`parse_queries`（[`prompts.py:122`](../../src/babyrag/prompts.py#L122)）去掉每行首尾的
+空格和 `-•` 符号，最多保留 3 条改写。
 
 ### 7.3 `expand_context`
 
@@ -272,6 +272,9 @@ hits = fuse_rrf(leaves, summaries, top_n=20) if summaries else leaves
 ```
 
 **collapsed tree**：叶子 + 摘要一起查，再融合。只查摘要会丢事实细节。
+
+`except Exception` 会把“摘要 collection 不存在”“SiliconFlow 网络错误”都吞成空摘要，
+然后静默退化成只查叶子；如果 r6 效果异常，先确认 `raptor` collection 是否真的建好。
 
 ## 调用关系
 

@@ -66,6 +66,8 @@ flowchart LR
   I --> J[build_index --variant masked]
 ```
 
+`merge_corpus` 是可选的：日常全量重建可以跳过；要保留 30 题的 gold 文档时必须跑。
+
 ### 2.1 `prepare_corpus.py`
 
 [`scripts/prepare_corpus.py`](../../scripts/prepare_corpus.py) 的 `main`：
@@ -95,6 +97,9 @@ docs = ordered[: args.size]
 ### 2.2 `merge_corpus.py`
 
 把原 200 篇种子并回新语料，按标题去重，保证 30 题的 gold 文档不丢。
+`prepare_corpus` 默认写 `data/corpus.jsonl`，而 `merge_corpus` 默认读
+`data/corpus.base.jsonl` 和 `data/corpus.rule.jsonl`；merge 前要把两份输入放好，
+或用 `--seed` / `--extra` 显式指定。
 
 ```python
 seen = {norm_title(d["title"]) for d in seed}
@@ -212,6 +217,10 @@ rows.append({"chunk_id": cid, ..., "contextual_text": f"{prefix}\n{chunk['text']
 
 从 RAGBench `emanual` 取 25 题，文档去重、切分，写 `data/public/*`。
 `queries.jsonl` 的 `gold_doc_ids` 来自 `sentence_support_information` 的 supporting keys。
+
+公开锚点固定 **25 题**：`build_public_benchmark.py` 的 `COUNT = 25`
+（[`build_public_benchmark.py:23`](../../scripts/build_public_benchmark.py#L23)），
+`run_eval.py` 的 public 报告说明和 `data/public/manifest.json` 也按 25 题。
 
 ## 5. 评测脚本
 

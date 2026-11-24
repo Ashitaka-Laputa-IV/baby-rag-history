@@ -245,8 +245,10 @@ if str(mode).lower() != "wal":
     except sqlite3.OperationalError: pass
 ```
 
-- `check_same_thread=False`：评测线程池会共享连接。
-- `busy_timeout` + `_retry`：多个线程同时写时不要直接失败。
+- `check_same_thread=False`：放宽 SQLite 的“只能本线程使用”检查。当前评测的 `_env` 每个线程
+  会建自己的 `LLMClient` / `Cache`，所以真正共享的是**数据库文件**，不是同一个连接；
+  这个参数是防御性放宽。
+- `busy_timeout` + `_retry`：多个连接同时写同一个 SQLite 文件时等待并重试，而不是直接失败。
 - WAL 只设一次；已经是 WAL 就跳过。
 
 `get` / `put`（[`cache.py:51`](../../src/babyrag/cache.py#L51)、[`cache.py:56`](../../src/babyrag/cache.py#L56)）
@@ -292,4 +294,5 @@ graph.Runner
 
 1. 前四个键是文件路径（`Path`），后三个是 Chroma collection 名（`str`）。
 2. `node_records` 有 `operator.add` reducer，框架会把节点返回值再合并一次；原地修改会重复。
-3. 评测用线程池并发调用，同一个 SQLite 连接跨线程使用，且写操作可能互相锁；`busy_timeout` + `_retry` 让写等待而不是直接报错。
+3. 评测线程各自建 `Cache`，但多个连接会同时读写同一个 SQLite 文件；`busy_timeout` + `_retry`
+   让写操作等待重试。`check_same_thread=False` 则是允许连接跨线程使用的防御性设置。

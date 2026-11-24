@@ -162,6 +162,7 @@ with COST_LOG.open("a", encoding="utf-8") as f:
 ```
 
 `results/cost.jsonl` 是 append-only；每次真实调用一行。缓存命中不写这一行（因为没花钱）。
+只有 `use_cache=True` 才读写缓存；传 `use_cache=False` 时会完全跳过这两步。
 
 ## 5. 重试：`_invoke_with_backoff`
 
@@ -212,7 +213,7 @@ tout = len(enc.encode(text))
 
 `_message_text`（[`llm.py:145`](../../src/babyrag/llm.py#L145)）处理 `content` 不是字符串的情况：
 有些网关返回 `[{"type": "text", "text": "..."}]` 这样的 block 列表，它只拼 `text` 字段，
-避免把 JSON 结构直接写进答案或成本日志。
+避免把 JSON 结构直接写进答案或缓存。
 
 ## 7. `record` / `budget_left`
 

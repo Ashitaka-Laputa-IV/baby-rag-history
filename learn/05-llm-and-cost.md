@@ -42,10 +42,10 @@ self._llm = ChatOpenAI(
 
 ## 缓存：一本“问答备忘录”
 
-每次调用前，程序先算一个指纹：
+默认每次调用前，程序先算一个指纹：
 
 ```text
-指纹 = sha256(阶段 + 提示词版本 + 模型名 + system + 用户输入)
+指纹 = sha256(阶段 + 提示词版本 + 模型名 + system + 用户输入 + extra_key)
 ```
 
 然后去 SQLite 里查：这个指纹是不是已经问过？
@@ -72,13 +72,21 @@ flowchart LR
   F --> G[记一笔账]
 ```
 
-指纹包含“提示词版本”，所以改了提示词、把版本号从 `v1` 改成 `v2`，旧缓存会自动失效，不会拿旧答案。
+指纹里也包含完整的 `system` 和用户 prompt，所以**改提示词文本本身**就会让旧缓存失效。
+`prompt_version` 只是额外的显式版本标签；当前节点没有传它，`invoke` 默认用 `v1`，
+`prompts.py` 里的 `PROMPT_VERSION` 也没有接线。只改那个常量不会换缓存版本，要显式传给
+`invoke(prompt_version=...)` 才生效。
 
 真正调用后，按 token 算钱：
 
 ```python
-cost = tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ
+if self.settings.provider == "siliconflow":
+    cost = 0.0
+else:
+    cost = tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ
 ```
+
+SiliconFlow 免费档直接把 `cost` 记 0，不走 DeepSeek 的单价。
 
 ## 为什么缓存命中还要记 token
 
@@ -91,7 +99,8 @@ cost = tin * PRICE_INPUT + tout * PRICE_OUTPUT + cached_in * PRICE_CACHE_READ
 
 ## 网络不好怎么办
 
-调用失败会自动重试，最多 5 次，间隔越来越长（1 秒、2 秒、4 秒……最多 30 秒）。
+调用失败会自动重试：外层 `_invoke_with_backoff` 最多 5 次，间隔越来越长
+（1 秒、2 秒、4 秒……最多 30 秒）；底下的 `ChatOpenAI` 自身还设了 `max_retries=2`。
 
 会重试的错误包括：429（限流）、500/502/503/504、超时、连接断开。
 不会重试的错误（比如参数写错）会立刻抛出。
@@ -124,7 +133,7 @@ retryable = any(s in text for s in (
 
 ## 如果你只记一件事
 
-> 每次模型调用都先查“指纹备忘录”；命中就免费。索引是主要开销，答题很便宜。
+> 默认每次模型调用都先查“指纹备忘录”；命中就免费。索引是主要开销，答题很便宜。
 
 ## 想深入看代码
 
@@ -138,4 +147,5 @@ retryable = any(s in text for s in (
 
 **问：** 为什么改了提示词之后，旧缓存不会继续生效？
 
-**答：** 指纹里包含 `prompt_version`；改提示词时同时改版本号，指纹就变了，旧缓存自然查不到。
+**答：** 因为完整 prompt / system 也在指纹里，改文本就会变；但当前节点没有传 `prompt_version`，
+只改 `PROMPT_VERSION` 常量不会生效，要显式传入才会换版本标签。

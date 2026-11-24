@@ -238,7 +238,7 @@ graph.Runner
 | BM25 零分未过滤 | retrieval.py:82 | 无关卡片进 RRF |
 | rerank 下标映射错 | retrieval.py:199 | 排序结果对错卡片 |
 | 超预算直接 break | retrieval.py:220 | 丢掉后面更小的可用 chunk |
-| 以为 masked title 完全消失 | retrieval.py:216 | 上下文仍可能出现标题 |
+| 以为 masked title 完全消失 | retrieval.py:215 | 上下文仍可能出现标题 |
 
 ## 自测
 

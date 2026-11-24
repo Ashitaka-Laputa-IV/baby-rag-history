@@ -13,7 +13,7 @@
 
 ## 说明
 
-- RAGBench emanual test 子集（40 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。
+- RAGBench emanual test 子集（25 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。
 - `可答 acc` 只算可回答问题（所有 rung 同一分母）；`弃答 acc` 只算无答案题，所有 rung 都报。
 - 方括号是 Wilson 95% 置信区间（小样本比例比 bootstrap 更稳）；bootstrap 结果仍在 `summary.json`。
 - 综合分 = 100 × (0.50×可答 acc + 0.30×evidence R@1 + 0.20×MRR@10) / (1 + 100×cold $/q)。

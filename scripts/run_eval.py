@@ -65,7 +65,7 @@ def main() -> int:
         note = "10 道分层 test 子集（single 4 / entity 2 / multi 2 / global 1 / none 1）；题目在开发期已见过，只能作为稳健性检查，不是真正 holdout。"
     elif args.variant == "public":
         label = "RAGBench external anchor"
-        note = "RAGBench emanual test 子集（40 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。"
+        note = "RAGBench emanual test 子集（25 题，英文用户手册）；只作外部锚点，不与中文维基主榜混算。"
     elif manual:
         label = "middle-fact questions (50, handwritten)"
         note = ("50 道手写题，答案均为文档中段的事实；每题 evidence 已校验落在 gold 文档中间三分之一的 chunk 内。"

@@ -43,8 +43,10 @@ START → plan → dispatch ─┬→ retrieve_dense / retrieve_hybrid / retriev
   每个 rung 只是 [`src/babyrag/rungs.py`](src/babyrag/rungs.py) 里的一行。
 - **最终上下文固定 top-5 / 4,000 token**：所有 rung 同一预算。
 - **`agentic` 是带循环的普通节点**，不是独立的 LangGraph 子图。
-- **两套索引变体**：`original` 与 `masked`（去标题 + 200 篇同前缀干扰文档）。
-- **所有 LLM 调用走 SQLite 缓存**，键 = stage + prompt_version + model + 输入哈希。
+- **两套主索引变体**：`original` 与 `masked`（去标题 + 200 篇同前缀干扰文档）；
+  另有 `public` 变体只用于 RAGBench 外部锚点。
+- **生成/检索/评测阶段的 LLM 调用走 SQLite 缓存**，键 = stage + prompt_version + model + 输入哈希；
+  `prepare_corpus` 的分类器是独立调用，不经过这层缓存。
 
 实际编译出的图（19 节点 / 32 边）：[PNG](docs/graph.png) · [交互版 HTML](docs/graph.html)。
 

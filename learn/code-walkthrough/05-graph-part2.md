@@ -127,7 +127,14 @@ abstain = state.get("abstain", False) or answer.strip() == "无法回答"
 return {"abstain": abstain, ...}
 ```
 
-它只做最终确认，没有引用合法性检查。`finalize`（[`graph.py:256`](../../src/babyrag/graph.py#L256)）：
+从函数本身看，它只做最终确认，没有引用合法性检查。
+
+**但 r8 的顺序要注意**：`RUNGS["r8_agentic"]` 是 `agentic → verify → generate`，
+所以 `verify` 实际在 `generate` 之前跑，必然拿不到 `answer`，返回的 `abstain` 仍是 False。
+最终是否弃答由 `generate` 决定；`verify` 目前更像预留节点。要让它在生成后检查，
+得把顺序改成 `agentic → generate → verify`，但那是行为变更，不是这篇文档的修正。
+
+`finalize`（[`graph.py:256`](../../src/babyrag/graph.py#L256)）：
 
 ```python
 records = state.get("node_records") or []
@@ -196,6 +203,8 @@ return {
 - `recursion_limit=60` 防死循环。
 - `cost["latency_ms"]` 用墙钟覆盖节点累计值，包含排队/调度时间。
 - `hits` 保留 `text` 和 `doc_ids`，因为评测要算 evidence recall。
+- `trajectory` 留在 graph state 里，**没有**放进 `run_one` 的返回值，所以 CLI 看不到；
+  调试时可以直接打印 `graph.invoke(...)` 的原始结果。
 
 ## 调用关系
 
