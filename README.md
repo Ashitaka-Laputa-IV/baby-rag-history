@@ -5,6 +5,7 @@
 同一份语料、同一批问题、同一个 4,000-token 上下文预算；每个 rung 只改检索链路的一个变量，
 并同时记录效果、召回、弃答、延迟和成本。
 
+> 项目网页：[ashitaka-laputa-iv.github.io/baby-rag-history](https://ashitaka-laputa-iv.github.io/baby-rag-history/) ·
 > 读源码：[`learn/README.md`](learn/README.md) ·
 > 逐函数代码漫游：[`learn/code-walkthrough/README.md`](learn/code-walkthrough/README.md) ·
 > 文档索引：[`docs/README.md`](docs/README.md) ·
@@ -49,6 +50,16 @@ START → plan → dispatch ─┬→ retrieve_dense / retrieve_hybrid / retriev
   `prepare_corpus` 的分类器是独立调用，不经过这层缓存。
 
 实际编译出的图（19 节点 / 32 边）：[PNG](docs/graph.png) · [交互版 HTML](docs/graph.html)。
+
+## 项目网页
+
+浅色单页展示：[`site/index.html`](site/index.html)，线上地址
+[ashitaka-laputa-iv.github.io/baby-rag-history](https://ashitaka-laputa-iv.github.io/baby-rag-history/)。
+页面包含九个台阶的计划切换、原题/masked 结果柱、架构图和复制按钮；本地预览：
+
+```bash
+python -m http.server 8000 --directory site
+```
 
 ## 快速开始
 
