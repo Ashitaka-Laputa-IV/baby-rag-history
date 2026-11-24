@@ -304,6 +304,36 @@
 
   requestAnimationFrame(() => centerTab(document.querySelector(".rung-tab.is-active"), true));
 
+  const graphSelect = $("#graphRung");
+  const graphCaption = $("#graphCaption");
+  const flow = $("#flow");
+
+  function highlightGraph(id) {
+    if (!flow) return;
+    const rung = rungs[id];
+    if (!rung) return;
+    const plan = id === "adaptive" ? [] : rung.plan;
+    flow.classList.toggle("has-focus", plan.length > 0);
+    for (const node of $$(".stage-node", flow)) {
+      node.classList.toggle("is-route", plan.includes(node.dataset.stage));
+    }
+    if (graphCaption) {
+      if (id === "adaptive") {
+        graphCaption.textContent = "Adaptive Router：按题型/长度选择一档，再执行对应计划。";
+      } else {
+        graphCaption.innerHTML =
+          `${rung.name}：` +
+          plan.map((step) => `<code>${step}</code>`).join(" → ") +
+          "。虚线回环代表 14 个 stage 共享的返回边。";
+      }
+    }
+  }
+
+  if (graphSelect) {
+    graphSelect.addEventListener("change", () => highlightGraph(graphSelect.value));
+    highlightGraph(graphSelect.value);
+  }
+
   const barList = $("#barList");
   const resultTitle = $("#resultsTitle");
   const resultsNote = $("#resultsNote");

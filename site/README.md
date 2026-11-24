@@ -21,5 +21,5 @@ uv run python -m http.server 8000 --directory site
 - 手动运行 `Deploy project site`；
 - 或推送一个 `site-*` tag，例如 `site-2026-11-24`。
 
-工作流会把 `site/` 作为静态站点上传。`site/assets/graph.png` 和 `site/assets/graph.html` 是
-`docs/graph.png` / `docs/graph.html` 的副本；重新生成图后需要同步覆盖。
+工作流会把 `site/` 作为静态站点上传。架构图是 `site/index.html` + `site/styles.css`
+手工构建的 HTML 流程图，不再依赖 `docs/graph.png` 或 Mermaid 截图。

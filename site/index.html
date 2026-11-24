@@ -32,7 +32,7 @@
   <header class="site-header" id="top">
     <nav class="nav shell" aria-label="主导航">
       <a class="brand" href="#top" aria-label="baby-rag-history 首页">
-        <span class="brand-mark" aria-hidden="true"><span>r</span><strong>9</strong></span>
+        <span class="brand-mark" aria-hidden="true"><img src="./assets/favicon.svg" alt=""></span>
         <span class="brand-word">baby-rag-history</span>
       </a>
       <div class="nav-links">
@@ -224,13 +224,110 @@
             <a class="text-link" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history/blob/main/learn/04-rungs-and-graph.md" target="_blank" rel="noreferrer">读台阶与图 <span aria-hidden="true">↗</span></a>
           </div>
         </div>
-        <figure class="graph-card reveal delay-1">
-          <div class="graph-head"><span><span class="live-dot"></span> compiled graph</span><span>19 nodes · 32 edges</span></div>
-          <a href="./assets/graph.html" target="_blank" rel="noreferrer" aria-label="打开交互版 LangGraph 结构图">
-            <img src="./assets/graph.png" alt="LangGraph 编译结构：19 个节点、32 条边" loading="lazy">
-            <span class="graph-open">打开交互图 <span aria-hidden="true">↗</span></span>
-          </a>
-          <figcaption>由 <code>scripts/render_graph.py</code> 从 <code>build_graph()</code> 直接生成。</figcaption>
+        <figure class="architecture-card reveal delay-1">
+          <div class="diagram-head">
+            <div class="diagram-title">
+              <span class="live-dot"></span>
+              <span>compiled graph</span>
+              <span class="diagram-meta">19 nodes · 32 edges · one dispatcher</span>
+            </div>
+            <label class="graph-picker" for="graphRung">
+              <span>高亮路线</span>
+              <select id="graphRung">
+                <option value="r0_dense">r0 · dense</option>
+                <option value="r1_hybrid">r1 · hybrid</option>
+                <option value="r2_rerank">r2 · rerank</option>
+                <option value="r3_hyde">r3 · HyDE</option>
+                <option value="r4_multiquery">r4 · multi-query</option>
+                <option value="r5_contextual" selected>r5 · contextual</option>
+                <option value="r6_raptor">r6 · RAPTOR</option>
+                <option value="r7_crag">r7 · CRAG</option>
+                <option value="r8_agentic">r8 · agentic</option>
+                <option value="adaptive">A · router</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="flow" id="flow">
+            <div class="flow-top">
+              <span class="terminal-pill">START</span>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <div class="flow-node flow-special" data-stage="plan">
+                <span class="node-kicker">A</span>
+                <strong>plan</strong>
+                <small>读工序单 · cursor = 0</small>
+              </div>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <div class="flow-node flow-hub" data-stage="dispatch">
+                <span class="node-kicker">B</span>
+                <strong>dispatch</strong>
+                <small>唯一路由点</small>
+              </div>
+            </div>
+
+            <div class="flow-branch">
+              <div class="branch-note"><span aria-hidden="true">⇣</span> 按 <code>plan[cursor]</code> 派工</div>
+              <div class="stage-groups">
+                <div class="stage-group" style="--group:#5aa9f5;--group-soft:#eef7ff">
+                  <div class="group-head"><span class="group-dot"></span><span>retrieve</span><small>05</small></div>
+                  <div class="group-nodes">
+                    <div class="stage-node" data-stage="retrieve_dense"><span>01</span><code>retrieve_dense</code></div>
+                    <div class="stage-node" data-stage="retrieve_hybrid"><span>02</span><code>retrieve_hybrid</code></div>
+                    <div class="stage-node" data-stage="retrieve_contextual"><span>03</span><code>retrieve_contextual</code></div>
+                    <div class="stage-node" data-stage="retrieve_multi"><span>04</span><code>retrieve_multi</code></div>
+                    <div class="stage-node" data-stage="retrieve_raptor"><span>05</span><code>retrieve_raptor</code></div>
+                  </div>
+                </div>
+
+                <div class="stage-group" style="--group:#8d86ff;--group-soft:#f1efff">
+                  <div class="group-head"><span class="group-dot"></span><span>transform</span><small>02</small></div>
+                  <div class="group-nodes">
+                    <div class="stage-node" data-stage="hyde"><span>06</span><code>hyde</code></div>
+                    <div class="stage-node" data-stage="rewrite_multi_query"><span>07</span><code>rewrite_multi_query</code></div>
+                  </div>
+                </div>
+
+                <div class="stage-group" style="--group:#ffb05c;--group-soft:#fff4e7">
+                  <div class="group-head"><span class="group-dot"></span><span>fuse & rank</span><small>03</small></div>
+                  <div class="group-nodes">
+                    <div class="stage-node" data-stage="fuse_rrf"><span>08</span><code>fuse_rrf</code></div>
+                    <div class="stage-node" data-stage="rerank"><span>09</span><code>rerank</code></div>
+                    <div class="stage-node" data-stage="expand_context"><span>10</span><code>expand_context</code></div>
+                  </div>
+                </div>
+
+                <div class="stage-group" style="--group:#31b98f;--group-soft:#e9fbf4">
+                  <div class="group-head"><span class="group-dot"></span><span>decide & answer</span><small>04</small></div>
+                  <div class="group-nodes">
+                    <div class="stage-node" data-stage="grade"><span>11</span><code>grade</code></div>
+                    <div class="stage-node" data-stage="agentic"><span>12</span><code>agentic</code></div>
+                    <div class="stage-node" data-stage="verify"><span>13</span><code>verify</code></div>
+                    <div class="stage-node" data-stage="generate"><span>14</span><code>generate</code></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-return">
+              <span class="return-icon" aria-hidden="true">↺</span>
+              <span><strong>cursor + 1</strong> · 每个 stage 做完回到 dispatch</span>
+              <span class="return-tag">14 return edges</span>
+            </div>
+
+            <div class="flow-bottom">
+              <span class="bottom-label">计划走完</span>
+              <span class="flow-arrow" aria-hidden="true">↓</span>
+              <div class="flow-node" data-stage="finalize">
+                <span class="node-kicker">C</span>
+                <strong>finalize</strong>
+                <small>汇总 cost / trajectory</small>
+              </div>
+              <span class="flow-arrow" aria-hidden="true">→</span>
+              <span class="terminal-pill terminal-end">END</span>
+            </div>
+          </div>
+
+          <figcaption id="graphCaption">r5 Contextual Retrieval：<code>retrieve_contextual</code> → <code>fuse_rrf</code> → <code>rerank</code> → <code>generate</code>。虚线回环代表 14 个 stage 共享的返回边。</figcaption>
         </figure>
       </div>
     </section>
@@ -307,7 +404,7 @@ uv run python -m scripts.run_eval \
         <a class="doc-card reveal" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history/blob/main/docs/design.md" target="_blank" rel="noreferrer"><span class="doc-tag">DESIGN</span><h3>架构与取舍</h3><p>一张图、计划表、数据管线和关键决策。</p><span class="doc-arrow">↗</span></a>
         <a class="doc-card reveal delay-1" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history/blob/main/docs/evaluation.md" target="_blank" rel="noreferrer"><span class="doc-tag">EVAL</span><h3>指标与协议</h3><p>分母、Wilson 区间、综合分和局限。</p><span class="doc-arrow">↗</span></a>
         <a class="doc-card reveal delay-2" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history/blob/main/results/leaderboard.md" target="_blank" rel="noreferrer"><span class="doc-tag">NUMBERS</span><h3>原始排行榜</h3><p>30 道题、masked、难题和公开锚点。</p><span class="doc-arrow">↗</span></a>
-        <a class="doc-card reveal" href="./assets/graph.html" target="_blank" rel="noreferrer"><span class="doc-tag">GRAPH</span><h3>交互版结构图</h3><p>从 <code>build_graph()</code> 生成的 19 节点图。</p><span class="doc-arrow">↗</span></a>
+        <a class="doc-card reveal" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history/blob/feat/rag-ladder/learn/07-change-the-code.md" target="_blank" rel="noreferrer"><span class="doc-tag">CODE MAP</span><h3>动手改代码</h3><p>改 rung、top-k、指标和 masked 泄漏时从哪里下手。</p><span class="doc-arrow">↗</span></a>
         <a class="doc-card reveal delay-1" href="https://github.com/Ashitaka-Laputa-IV/baby-rag-history" target="_blank" rel="noreferrer"><span class="doc-tag">SOURCE</span><h3>GitHub 仓库</h3><p>代码、数据脚本、结果和提交历史。</p><span class="doc-arrow">↗</span></a>
       </div>
     </section>
@@ -315,7 +412,7 @@ uv run python -m scripts.run_eval \
 
   <footer class="footer shell">
     <div class="footer-main">
-      <span class="brand-mark" aria-hidden="true"><span>r</span><strong>9</strong></span>
+      <span class="brand-mark" aria-hidden="true"><img src="./assets/favicon.svg" alt=""></span>
       <p><strong>baby-rag-history</strong> · MIT · built with LangGraph</p>
     </div>
     <p class="fineprint">语料 CC-BY-SA-4.0 · 评测是小样本探索，不是 SOTA 结论 · <span id="year">2026</span></p>
