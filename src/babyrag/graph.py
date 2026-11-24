@@ -262,6 +262,11 @@ class Runner:
 
 
 def build_graph(services: Services, llm: LLMClient):
+    """Compile the plan-dispatch graph.
+
+    The compiled structure is rendered to `docs/graph.html` and `docs/graph.png`
+    by `scripts/render_graph.py`.
+    """
     runner = Runner(services, llm)
     builder = StateGraph(RAGState)
     builder.add_node("plan", runner.plan)

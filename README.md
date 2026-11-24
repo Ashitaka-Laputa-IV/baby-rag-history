@@ -45,6 +45,8 @@ START → plan → dispatch ─┬→ retrieve_dense / retrieve_hybrid / retriev
 - **两套索引变体**：`original` 与 `masked`（去标题 + 200 篇同前缀干扰文档）。
 - **所有 LLM 调用走 SQLite 缓存**，键 = stage + prompt_version + model + 输入哈希。
 
+实际编译出的图（19 节点 / 32 边）：[PNG](docs/graph.png) · [交互版 HTML](docs/graph.html)。
+
 ## 快速开始
 
 ```bash

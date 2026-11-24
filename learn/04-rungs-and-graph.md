@@ -56,6 +56,12 @@ flowchart LR
   dispatch -->|单子走完| finalize[收盘] --> END
 ```
 
+上面是简化的骨架。实际 `build_graph()` 编译出来是 **19 个节点、32 条边**：
+
+![LangGraph 实际结构](../docs/graph.png)
+
+[打开交互版 HTML](../docs/graph.html) · 图由 `scripts/render_graph.py` 生成。
+
 - `plan`：把 `RUNGS[rung]` 复制到 `state["plan"]`。
 - `dispatch`：什么都不做，只是让条件边有地方读最新状态。
 - `route`：看 `plan[cursor]`，返回下一个工人的名字；走完返回 `finalize`。
@@ -151,7 +157,7 @@ for step in range(4):
 - 读单/派工：[graph.py:58](../src/babyrag/graph.py#L58)、[graph.py:74](../src/babyrag/graph.py#L74)
 - 自检：[graph.py:168](../src/babyrag/graph.py#L168)
 - 多轮：[graph.py:198](../src/babyrag/graph.py#L198)
-- 建图：[graph.py:261](../src/babyrag/graph.py#L261)
+- 建图：[graph.py:264](../src/babyrag/graph.py#L264)
 
 ## 检查一下
 

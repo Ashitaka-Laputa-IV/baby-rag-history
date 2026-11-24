@@ -14,13 +14,10 @@
 
 ## 2. 架构：一张图 + 计划表
 
-```text
-START → plan → dispatch ─┬→ retrieve_dense / retrieve_hybrid / retrieve_contextual
-                         ├→ retrieve_multi / retrieve_raptor
-                         ├→ hyde / rewrite_multi_query / fuse_rrf / rerank
-                         ├→ grade / agentic / verify / generate
-                         └→ finalize → END
-```
+![LangGraph 结构：19 个节点，32 条边](graph.png)
+
+[打开交互版 HTML](graph.html) · 由 [`scripts/render_graph.py`](../scripts/render_graph.py)
+从 `build_graph()` 直接生成；只做结构编译，不执行节点。
 
 - `plan` 只产出 `plan: list[str]` 和 `cursor`；`dispatch` 是唯一路由点，读 `plan[cursor]`。
 - 每个阶段节点只做一件事，做完 `cursor + 1` 回 `dispatch`；越界进 `finalize`。

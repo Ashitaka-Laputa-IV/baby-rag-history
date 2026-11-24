@@ -145,7 +145,7 @@ return plan[cursor] if cursor < len(plan) else "finalize"
 ## 想深入看代码
 
 - 入口：[cli.py:35](../src/babyrag/cli.py#L35)
-- 初始表格：[graph.py:281](../src/babyrag/graph.py#L281)
+- 初始表格：[graph.py:289](../src/babyrag/graph.py#L289)
 - 工序单：[rungs.py:5](../src/babyrag/rungs.py#L5)
 - 工头：[graph.py:58](../src/babyrag/graph.py#L58) 和 [graph.py:74](../src/babyrag/graph.py#L74)
 - 拼上下文：[retrieval.py:210](../src/babyrag/retrieval.py#L210)
