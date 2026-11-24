@@ -1,0 +1,60 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	plan(plan)
+	dispatch(dispatch)
+	retrieve_dense(retrieve_dense)
+	retrieve_hybrid(retrieve_hybrid)
+	retrieve_contextual(retrieve_contextual)
+	retrieve_multi(retrieve_multi)
+	retrieve_raptor(retrieve_raptor)
+	hyde(hyde)
+	rewrite_multi_query(rewrite_multi_query)
+	fuse_rrf(fuse_rrf)
+	rerank(rerank)
+	expand_context(expand_context)
+	grade(grade)
+	agentic(agentic)
+	verify(verify)
+	generate(generate)
+	finalize(finalize)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> plan;
+	agentic --> dispatch;
+	dispatch -.-> agentic;
+	dispatch -.-> expand_context;
+	dispatch -.-> finalize;
+	dispatch -.-> fuse_rrf;
+	dispatch -.-> generate;
+	dispatch -.-> grade;
+	dispatch -.-> hyde;
+	dispatch -.-> rerank;
+	dispatch -.-> retrieve_contextual;
+	dispatch -.-> retrieve_dense;
+	dispatch -.-> retrieve_hybrid;
+	dispatch -.-> retrieve_multi;
+	dispatch -.-> retrieve_raptor;
+	dispatch -.-> rewrite_multi_query;
+	dispatch -.-> verify;
+	expand_context --> dispatch;
+	fuse_rrf --> dispatch;
+	generate --> dispatch;
+	grade --> dispatch;
+	hyde --> dispatch;
+	plan --> dispatch;
+	rerank --> dispatch;
+	retrieve_contextual --> dispatch;
+	retrieve_dense --> dispatch;
+	retrieve_hybrid --> dispatch;
+	retrieve_multi --> dispatch;
+	retrieve_raptor --> dispatch;
+	rewrite_multi_query --> dispatch;
+	verify --> dispatch;
+	finalize --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

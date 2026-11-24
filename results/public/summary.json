@@ -1,0 +1,326 @@
+{
+  "r0_dense": {
+    "n": 25,
+    "correct": 13,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.52,
+    "accuracy_ci": [
+      0.32,
+      0.72
+    ],
+    "accuracy_ci_wilson": [
+      0.335,
+      0.6997
+    ],
+    "doc@1": 0.72,
+    "doc_recall@5": 0.96,
+    "doc_recall_all@5": 0.92,
+    "context_precision@5": 0.2714,
+    "chunk@1": 0.5714,
+    "chunk@1_ci": [
+      0.2857,
+      0.8571
+    ],
+    "chunk@1_ci_wilson": [
+      0.3259,
+      0.7862
+    ],
+    "chunk@3": 0.9286,
+    "chunk@5": 0.9286,
+    "chunk_hit@5": 0.9286,
+    "mrr@10": 0.75,
+    "ndcg@10": 0.7967,
+    "abstain_accuracy": null,
+    "usd_total": 0.000351,
+    "usd_per_query": 1.4e-05,
+    "usd_cold_total": 0.011323,
+    "usd_cold_per_query": 0.000453,
+    "p50_ms": 120,
+    "p95_ms": 415,
+    "tokens_in": 28347,
+    "tokens_out": 11785,
+    "llm_calls": 1,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.5814,
+    "cost_factor": 0.9567,
+    "composite": 55.6
+  },
+  "r1_hybrid": {
+    "n": 25,
+    "correct": 14,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.56,
+    "accuracy_ci": [
+      0.36,
+      0.76
+    ],
+    "accuracy_ci_wilson": [
+      0.3707,
+      0.7333
+    ],
+    "doc@1": 0.64,
+    "doc_recall@5": 0.96,
+    "doc_recall_all@5": 0.84,
+    "context_precision@5": 0.3143,
+    "chunk@1": 0.5714,
+    "chunk@1_ci": [
+      0.2857,
+      0.8571
+    ],
+    "chunk@1_ci_wilson": [
+      0.3259,
+      0.7862
+    ],
+    "chunk@3": 0.8571,
+    "chunk@5": 0.9286,
+    "chunk_hit@5": 0.9286,
+    "mrr@10": 0.7202,
+    "ndcg@10": 0.7731,
+    "abstain_accuracy": null,
+    "usd_total": 0.0,
+    "usd_per_query": 0.0,
+    "usd_cold_total": 0.011968,
+    "usd_cold_per_query": 0.000479,
+    "p50_ms": 110,
+    "p95_ms": 936,
+    "tokens_in": 34267,
+    "tokens_out": 11380,
+    "llm_calls": 0,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.5955,
+    "cost_factor": 0.9543,
+    "composite": 56.8
+  },
+  "r2_rerank": {
+    "n": 25,
+    "correct": 15,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.6,
+    "accuracy_ci": [
+      0.4,
+      0.8
+    ],
+    "accuracy_ci_wilson": [
+      0.4074,
+      0.766
+    ],
+    "doc@1": 0.72,
+    "doc_recall@5": 1,
+    "doc_recall_all@5": 0.92,
+    "context_precision@5": 0.3143,
+    "chunk@1": 0.7857,
+    "chunk@1_ci": [
+      0.5714,
+      1.0
+    ],
+    "chunk@1_ci_wilson": [
+      0.5241,
+      0.9243
+    ],
+    "chunk@3": 1,
+    "chunk@5": 1,
+    "chunk_hit@5": 1,
+    "mrr@10": 0.8929,
+    "ndcg@10": 0.9209,
+    "abstain_accuracy": null,
+    "usd_total": 0.00035,
+    "usd_per_query": 1.4e-05,
+    "usd_cold_total": 0.013984,
+    "usd_cold_per_query": 0.000559,
+    "p50_ms": 477,
+    "p95_ms": 752,
+    "tokens_in": 49103,
+    "tokens_out": 11031,
+    "llm_calls": 1,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.7143,
+    "cost_factor": 0.9471,
+    "composite": 67.6
+  },
+  "r4_multiquery": {
+    "n": 25,
+    "correct": 11,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.44,
+    "accuracy_ci": [
+      0.24,
+      0.64
+    ],
+    "accuracy_ci_wilson": [
+      0.2667,
+      0.6293
+    ],
+    "doc@1": 0.68,
+    "doc_recall@5": 1,
+    "doc_recall_all@5": 0.92,
+    "context_precision@5": 0.3143,
+    "chunk@1": 0.6429,
+    "chunk@1_ci": [
+      0.3571,
+      0.8571
+    ],
+    "chunk@1_ci_wilson": [
+      0.3876,
+      0.8366
+    ],
+    "chunk@3": 1,
+    "chunk@5": 1,
+    "chunk_hit@5": 1,
+    "mrr@10": 0.8214,
+    "ndcg@10": 0.8682,
+    "abstain_accuracy": null,
+    "usd_total": 0.0,
+    "usd_per_query": 0.0,
+    "usd_cold_total": 0.017105,
+    "usd_cold_per_query": 0.000684,
+    "p50_ms": 823,
+    "p95_ms": 1275,
+    "tokens_in": 46693,
+    "tokens_out": 16835,
+    "llm_calls": 0,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.5772,
+    "cost_factor": 0.936,
+    "composite": 54.0
+  },
+  "r7_crag": {
+    "n": 25,
+    "correct": 15,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.6,
+    "accuracy_ci": [
+      0.4,
+      0.8
+    ],
+    "accuracy_ci_wilson": [
+      0.4074,
+      0.766
+    ],
+    "doc@1": 0.8,
+    "doc_recall@5": 1,
+    "doc_recall_all@5": 0.84,
+    "context_precision@5": 0.7571,
+    "chunk@1": 0.8571,
+    "chunk@1_ci": [
+      0.6429,
+      1.0
+    ],
+    "chunk@1_ci_wilson": [
+      0.6006,
+      0.9599
+    ],
+    "chunk@3": 0.9286,
+    "chunk@5": 0.9286,
+    "chunk_hit@5": 0.9286,
+    "mrr@10": 0.8929,
+    "ndcg@10": 0.9022,
+    "abstain_accuracy": null,
+    "usd_total": 0.006666,
+    "usd_per_query": 0.000267,
+    "usd_cold_total": 0.021935,
+    "usd_cold_per_query": 0.000877,
+    "p50_ms": 774,
+    "p95_ms": 12589,
+    "tokens_in": 40275,
+    "tokens_out": 26490,
+    "llm_calls": 17,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.7357,
+    "cost_factor": 0.9194,
+    "composite": 67.6
+  },
+  "r8_agentic": {
+    "n": 25,
+    "correct": 14,
+    "correct_n": 25,
+    "abstain_n": 0,
+    "accuracy": 0.56,
+    "accuracy_ci": [
+      0.36,
+      0.72
+    ],
+    "accuracy_ci_wilson": [
+      0.3707,
+      0.7333
+    ],
+    "doc@1": 0.64,
+    "doc_recall@5": 0.96,
+    "doc_recall_all@5": 0.84,
+    "context_precision@5": 0.3143,
+    "chunk@1": 0.5714,
+    "chunk@1_ci": [
+      0.2857,
+      0.8571
+    ],
+    "chunk@1_ci_wilson": [
+      0.3259,
+      0.7862
+    ],
+    "chunk@3": 0.8571,
+    "chunk@5": 0.9286,
+    "chunk_hit@5": 0.9286,
+    "mrr@10": 0.7202,
+    "ndcg@10": 0.7731,
+    "abstain_accuracy": null,
+    "usd_total": 0.012439,
+    "usd_per_query": 0.000498,
+    "usd_cold_total": 0.024407,
+    "usd_cold_per_query": 0.000976,
+    "p50_ms": 10409,
+    "p95_ms": 17940,
+    "tokens_in": 40098,
+    "tokens_out": 30654,
+    "llm_calls": 43,
+    "abstain_ci": [
+      null,
+      null
+    ],
+    "abstain_ci_wilson": [
+      null,
+      null
+    ],
+    "quality": 0.5955,
+    "cost_factor": 0.9111,
+    "composite": 54.3
+  }
+}

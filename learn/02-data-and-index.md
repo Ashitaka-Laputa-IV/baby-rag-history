@@ -1,0 +1,177 @@
+---
+title: 数据与索引
+date: 2026-11-23
+input_shape: concept
+subject: 语料如何变成可检索的卡片
+---
+
+# 数据与索引
+
+上一节里，程序说“找出相关卡片”。这一节回答：**卡片从哪来，为什么能按意思找。**
+
+## 一个图书馆的比喻
+
+- **语料** = 图书馆里的 1,000 本书（每本是一篇中文维基文章）。
+- **chunk（卡片）** = 把每本书剪成小段，一段约 512 个 token，粘在一张卡片上。
+- **embedding（语义坐标）** = 给每张卡片算一串数字；意思相近的卡片，数字也相近。
+- **BM25（关键词索引）** = 另一本目录，记录“哪个词出现在哪张卡片上”。
+- **Chroma** = 放“语义坐标”的书架，可以按坐标找最近的卡片。
+
+这个项目最后得到 **4,740 张卡片**。平均每篇文章 4 张，最多 12 张。
+
+## 为什么要把书剪开
+
+因为大模型一次能看的资料有限。这个项目固定：
+
+- 每次最多看 **5 张卡片**；
+- 总共不超过 **4,000 token**。
+
+如果直接把整本书塞进去，几页就满了，而且大部分内容和问题无关。
+
+## 两种“找卡片”的方式
+
+### 按意思找（语义检索）
+
+先把问题也变成一串数字，然后找数字最接近的卡片。
+
+比如问“前身创办于哪一年”，即使卡片里写的是“成立于 1836 年”，没有“前身”两个字，
+语义坐标仍然可能很近。
+
+### 按词找（关键词检索）
+
+看卡片里有没有“开姆尼茨”“工业大学”“1836”。
+
+专有名词、编号、年份，关键词检索经常比语义检索更准。
+
+**这就是为什么 r1 要同时用两种办法。** 两种都找，再合并。
+
+## 为什么要切两套“图书馆”
+
+原题有一个问题：30 道题里有 23 道**直接写了答案所在文章的名字**。
+如果文章标题和正文里也有这个名字，检索就变成“按标题匹配”，太容易了。
+
+所以项目准备了两套索引：
+
+| 变体 | 规模 | 做了什么 |
+|---|---:|---|
+| `original` | 1,000 篇 / 4,740 张 | 原始语料 |
+| `masked` | 1,200 篇 / 5,676 张 | 把卡片里的标题替换成「（标题已隐藏）」，再加 200 篇“同姓/同类型”的干扰文章 |
+| `public` | 25 题 / 54 张 | 英文手册，外部对照 |
+
+切变体只需要改一个环境变量 `BABYRAG_VARIANT`，不用改代码。三种变体只改三个变量，
+最后返回同一套字段：
+
+```python
+def variant_paths(variant):
+    if variant == "masked":
+        base, file_suffix, collection_suffix = DATA, ".masked", "_masked"
+    elif variant == "public":
+        base, file_suffix, collection_suffix = DATA / "public", "", "_public"
+    else:
+        base, file_suffix, collection_suffix = DATA, "", ""
+
+    return {
+        "corpus": base / f"corpus{file_suffix}.jsonl",
+        "chunks": base / f"chunks{file_suffix}.jsonl",
+        ...
+        "dense": f"chunks{collection_suffix}",
+    }
+```
+
+> 注意：masked 只替换了卡片**正文**里的标题；卡片还带着原来的标题元数据，
+> 拼上下文时标题仍可能出现。所以它是“部分去标题”，不是完全去掉。
+
+## 程序里怎么表示这些
+
+三样东西就够：
+
+1. **`Settings`**：路径、价格、模型名、当前用哪套索引。
+2. **`Chunk`**：一张卡片，有 `chunk_id`、`doc_id`、正文、分数、来源。
+3. **`RAGState`**：流程中不断更新的那张表，装着问题、候选卡片、答案、成本。
+
+`Chunk` 就是一张卡片：
+
+```python
+class Chunk(TypedDict, total=False):
+    chunk_id: str
+    doc_id: str
+    doc_ids: list[str]   # RAPTOR 摘要覆盖多个文档时用
+    title: str
+    text: str
+    score: float
+    rank: int
+    source: str          # dense | bm25 | rrf | rerank ...
+    level: int           # RAPTOR 层级
+```
+
+`RAGState` 就是那张“这一题现在到哪了”的表：
+
+```python
+class RAGState(TypedDict, total=False):
+    # 输入 / 计划
+    qid: str
+    question: str
+    mode: Literal["ladder", "adaptive"]
+    rung: str
+    plan: list[str]
+    cursor: int
+    route_reason: str
+    # 查询
+    qtype: str
+    query_variants: list[str]
+    # 检索
+    dense_hits: list[Chunk]
+    bm25_hits: list[Chunk]
+    multi_hits: list[list[Chunk]]
+    hits: list[Chunk]
+    # 生成
+    answer: str
+    citations: list[str]
+    # 控制
+    grade: Literal["correct", "ambiguous", "incorrect"]
+    retries: int
+    abstain: bool
+    # 观测
+    node_records: Annotated[list[NodeRecord], operator.add]
+    trajectory: Annotated[list[Step], operator.add]
+    cost: Cost
+    error: str | None
+```
+
+注意最后两个 reducer 字段：`node_records` / `trajectory` 用了 `operator.add`，意思是“节点返回的列表要**追加**，不是覆盖”。
+
+路径和预算则来自 `Settings` / 常量：
+
+```python
+MAX_CONTEXT_TOKENS = 4000
+CHUNK_SIZE = 512
+CHUNK_OVERLAP = 64
+```
+
+你不需要背字段。只要记住：**`Settings` 管“在哪”，`Chunk` 管“一张卡片”，`RAGState` 管“这一题现在到哪了”。**
+
+## 切卡片的质量怎么保证
+
+切卡片不是随便按字数切。项目用 `chonkie` 按中文标点（。！？；）切，尽量保持句子完整。
+
+如果一句话本身超过 512 token（维基里偶尔有），会先被 `fix_long_sentences.py`
+在标点处拆开，否则切出来的卡片会超过上限。
+
+## 如果你只记一件事
+
+> 语料被切成约 500 字的卡片；每张卡片同时有“语义坐标”和“关键词索引”，
+> 所以既能按意思找，也能按词找。
+
+## 想深入看代码
+
+- 路径与价格：[config.py:57](../src/babyrag/config.py#L57)
+- 三套索引的路径：[config.py:28](../src/babyrag/config.py#L28)
+- 卡片与状态：[types.py:9](../src/babyrag/types.py#L9)、[types.py:48](../src/babyrag/types.py#L48)
+- 切卡片：[scripts/build_chunks.py](../scripts/build_chunks.py)
+- 造 masked 语料：[scripts/build_masked_corpus.py](../scripts/build_masked_corpus.py)
+
+## 检查一下
+
+**问：** 为什么同一份语料要同时建“语义索引”和“关键词索引”？
+
+**答：** 语义索引擅长“意思相近但用词不同”，关键词索引擅长“专名、编号、年份”。两边都找，再合并，比只用一种稳。
