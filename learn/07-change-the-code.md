@@ -14,7 +14,7 @@ subject: 跑起来、改行为、排查问题
 ```bash
 uv sync
 cp .env.example .env          # 填两个 key
-uv run python -m pytest -q    # 7 个离线测试
+uv run python -m pytest -q    # 8 个离线测试
 uv run babyrag info           # 看 9 个 rung
 uv run babyrag ask "开姆尼茨工业大学的前身创办于哪一年？" --rung r2_rerank
 ```

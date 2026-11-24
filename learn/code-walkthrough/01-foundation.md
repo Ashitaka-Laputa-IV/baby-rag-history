@@ -179,7 +179,7 @@ class Chunk(TypedDict, total=False):
 
 ### 2.2 `RAGState`
 
-[`types.py:48`](../../src/babyrag/types.py#L48) 是整张流程表。关键在最后两行：
+[`types.py:48`](../../src/babyrag/types.py#L48) 是整张流程表。关键在最后两个 reducer 字段：
 
 ```python
 node_records: Annotated[list[NodeRecord], operator.add]

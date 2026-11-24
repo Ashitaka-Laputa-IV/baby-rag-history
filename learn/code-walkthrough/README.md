@@ -37,7 +37,7 @@ subject: baby-rag-history 的逐函数代码阅读
 | `budget_left` | `llm.py:141` | 预留接口，图里没有调用 |
 | `usd()` | `config.py:131` | 没有调用者；`llm.py` 内联了同样公式 |
 | `PROMPT_VERSION` | `prompts.py:8` | 没有节点 import；`invoke` 默认 `"v1"` |
-| `run_name` | `eval.py:69` | 参数未被 `evaluate` 使用；目录名由脚本直接传给 `write_reports` |
+| `run_name` | `eval.py:71` | 参数未被 `evaluate` 使用；目录名由脚本直接传给 `write_reports` |
 
 `expand_context` 已经注册成节点，但 `RUNGS` 里没有 rung 使用它；它是给“普通 chunk + contextual 前缀”预留的。
 

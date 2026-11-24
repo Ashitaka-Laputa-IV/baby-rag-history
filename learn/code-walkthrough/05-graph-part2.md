@@ -54,8 +54,11 @@ return {"hits": hits, "grade": verdict, "cursor": state["cursor"] + 1,
 4. 重查会改写问题、重新 hybrid + rerank，写入新 hits。
 5. 否则按 `relevant` 过滤；注意 `relevant` 是 1-based，代码里 `i - 1`。
 
+`grade` 本身**从不设置 `abstain`**；它只过滤/重查，r7 的弃答仍然由最后 `generate` 的通用路径决定。
+
 **为什么把重查放在节点内部？** 如果拆成 `grade → rewrite → retrieve → grade` 的循环，
-`plan` 会无限增长；节点内做一次更简单，也好控成本。
+同一段计划会被反复执行，成本和步数会失控；`plan` 本身是 `RUNGS[rung]` 的固定副本，
+不会变长。节点内做一次更简单，也好控成本。
 
 ## 2. `agentic`：四步 ReAct
 
@@ -222,7 +225,7 @@ build_graph -> compile -> run_one -> graph.invoke
 | 易错点 | 位置 | 后果 |
 |---|---|---|
 | 把 6 条 chunk 拆成 6 次 grade 调用 | graph.py:173 | 成本 ×6，且更容易触发限流 |
-| 把重查拆成图里的循环 | graph.py:179 | `plan` 越来越长，成本和步数都难控 |
+| 把重查拆成图里的循环 | graph.py:179 | 同一段计划反复执行，成本和步数失控（plan 不会变长） |
 | agentic 用赋值覆盖 baseline | graph.py:205 | 原始查询命中的 gold chunk 被改写挤掉 |
 | `generate` 忘了再截 top-5 | graph.py:232 | 不同 rung 的上下文预算不再公平 |
 | `run_one` 不保留 `hits.text` | graph.py:304 | 评测无法算 evidence recall |

@@ -61,7 +61,8 @@ rung 之间的差值包含前面所有改动。严格的单因素消融需要另
 1. 来源：`wikimedia/wikipedia` 20231101 中文 shard（`zhwiki-00002.parquet`）。
 2. 过滤：800–4,000 字、CJK 比例 ≥ 0.3、排除列表/消歧义/车站等标题。
 3. 主题：LLM 分 person/geo/tech/hist/art 五类；失败回退规则分类。
-4. 抽样：`rank = blake2b(seed:title)`，按主题交错排序，嵌套抽样。
+4. 抽样：`rank = blake2b(seed:rank:title)`，按主题交错排序，嵌套抽样；`doc_id` 用
+   `f"{theme}-{blake2b(seed:title)}"`。
 5. 切分：chonkie 512 token / overlap 64；超长句先用 `fix_long_sentences.py` 预处理。
 6. 规模：**1,000 篇 / 五主题各 200 / 4,740 chunks**。
 

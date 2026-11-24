@@ -72,10 +72,11 @@ flowchart LR
 
 [`scripts/prepare_corpus.py`](../../scripts/prepare_corpus.py) 的 `main`：
 
-- 读 parquet（`iter_rows`）；
+- 读 parquet / JSON（`iter_rows`）；
 - `reject_reason` 过滤长度/语言/标题；
 - 分类（LLM 或 rule）；
-- 嵌套抽样：`rank = blake2b(seed:title)`，按主题交错；
+- 嵌套抽样：`rank = blake2b(seed:rank:title)`，按主题交错；`doc_id` 另用
+  `f"{theme}-{blake2b(seed:title)}"`，所以改 seed 会同时换顺序和 id；
 - 写 `data/corpus.jsonl` + manifest。
 
 关键抽样代码（简化）：

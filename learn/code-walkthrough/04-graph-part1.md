@@ -109,9 +109,9 @@ return {"plan": plan, "cursor": 0, "route_reason": reason,
 - `ladder`：`rung` 是外部传入的固定台阶。
 - `adaptive`：`adaptive_plan` 按题型/长度选一档（纯规则，不调 LLM）。
 
-注意返回值里的 `"rung": state.get("rung") or rung`：adaptive 模式下 `state["rung"]` 已经是
-`"adaptive"`，所以最终报告仍按 `adaptive` 分组；真正选中的台阶只体现在 `plan` 和
-`route_reason`（例如 `type=global`）里。
+`plan` 返回的 `"rung"` 只是写回 state，当前没有消费者。`run_one` 返回给评测的 `rung`
+是它的**入参**（[`graph.py:301`](../../src/babyrag/graph.py#L301)），所以报告按调用时传的
+`rung` 分组；adaptive 模式下真正选中的台阶看 `plan` 和 `route_reason`（例如 `type=global`）。
 
 ## 4. `dispatch` / `route`
 

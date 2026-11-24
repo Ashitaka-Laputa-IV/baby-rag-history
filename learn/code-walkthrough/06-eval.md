@@ -55,9 +55,9 @@ def evidence_in(text: str, evidence: str) -> bool:
     return b in a or (len(b) >= 12 and b[:12] in a)
 ```
 
-`_norm` 只去掉空白字符，不删标点。后半段 `b[:12] in a` 是容错：如果 evidence 有换行或
-空格差异，用前 12 个字兜底；如果差异发生在标点上，仍可能匹配失败。它可能误判，
-但比严格子串稳。
+`_norm` 只去掉空白字符，不删标点。严格子串失败时，后半段用 evidence 的前 12 个字兜底：
+它容忍的是 evidence 的**后半段缺失或被截断**（例如跨 chunk 边界，或文本只保留了开头），
+不是空格或换行差异——那些已经被 `_norm` 去掉了。它也可能把只匹配开头的片段误判为命中。
 
 ## 3. `judge` / `judge_ab`
 

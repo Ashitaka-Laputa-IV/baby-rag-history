@@ -138,7 +138,7 @@ class RAGState(TypedDict, total=False):
     error: str | None
 ```
 
-注意最后两行：`node_records` / `trajectory` 用了 `operator.add`，意思是“节点返回的列表要**追加**，不是覆盖”。
+注意最后两个 reducer 字段：`node_records` / `trajectory` 用了 `operator.add`，意思是“节点返回的列表要**追加**，不是覆盖”。
 
 路径和预算则来自 `Settings` / 常量：
 
