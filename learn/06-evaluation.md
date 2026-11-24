@@ -145,10 +145,10 @@ entry["composite"] = round(100 * quality * factor, 1)
 ## 想深入看代码
 
 - 打分：[eval.py:116](../src/babyrag/eval.py#L116)
-- 分母与弃答：[eval.py:156](../src/babyrag/eval.py#L156)
-- 汇总：[eval.py:177](../src/babyrag/eval.py#L177)
-- Wilson：[eval.py:262](../src/babyrag/eval.py#L262)
-- 报告：[eval.py:275](../src/babyrag/eval.py#L275)
+- 分母与弃答：[eval.py:169](../src/babyrag/eval.py#L169)
+- 汇总：[eval.py:188](../src/babyrag/eval.py#L188)
+- Wilson：[eval.py:276](../src/babyrag/eval.py#L276)
+- 报告：[eval.py:289](../src/babyrag/eval.py#L289)
 
 ## 检查一下
 

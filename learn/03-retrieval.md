@@ -133,11 +133,11 @@ if used + cost > budget:
 
 ## 想深入看代码
 
-- 语义检索：[retrieval.py:34](../src/babyrag/retrieval.py#L34)
-- 关键词检索：[retrieval.py:68](../src/babyrag/retrieval.py#L68)
-- RRF：[retrieval.py:171](../src/babyrag/retrieval.py#L171)
-- 精排：[retrieval.py:193](../src/babyrag/retrieval.py#L193)
-- 拼上下文：[retrieval.py:210](../src/babyrag/retrieval.py#L210)
+- 语义检索：[retrieval.py:33](../src/babyrag/retrieval.py#L33)
+- 关键词检索：[retrieval.py:67](../src/babyrag/retrieval.py#L67)
+- RRF：[retrieval.py:170](../src/babyrag/retrieval.py#L170)
+- 精排：[retrieval.py:192](../src/babyrag/retrieval.py#L192)
+- 拼上下文：[retrieval.py:209](../src/babyrag/retrieval.py#L209)
 
 ## 检查一下
 

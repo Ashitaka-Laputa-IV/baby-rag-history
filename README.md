@@ -6,6 +6,7 @@
 并同时记录效果、召回、弃答、延迟和成本。
 
 > 读源码：[`learn/README.md`](learn/README.md) ·
+> 逐函数代码漫游：[`learn/code-walkthrough/README.md`](learn/code-walkthrough/README.md) ·
 > 文档索引：[`docs/README.md`](docs/README.md) ·
 > 架构：[`docs/design.md`](docs/design.md) ·
 > 完整结果：[`docs/results.md`](docs/results.md) ·
@@ -75,7 +76,7 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 
 ## 读源码
 
-从 [`learn/README.md`](learn/README.md) 开始。它按调用链分成 8 篇：
+从 [`learn/README.md`](learn/README.md) 开始。它按调用链分成 7 篇：
 
 | 篇 | 内容 |
 |---|---|
@@ -86,6 +87,8 @@ uv run python -m scripts.run_eval --rungs all --workers 3
 | [模型调用与省钱](learn/05-llm-and-cost.md) | 为什么缓存能省下大部分钱 |
 | [怎么证明它有效](learn/06-evaluation.md) | 排行榜的数字到底怎么来的 |
 | [动手改代码](learn/07-change-the-code.md) | 想改行为时从哪里下手 |
+
+想逐函数读代码：[`learn/code-walkthrough/`](learn/code-walkthrough/README.md)。
 
 ## 数据
 

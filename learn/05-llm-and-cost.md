@@ -128,10 +128,10 @@ retryable = any(s in text for s in (
 
 ## 想深入看代码
 
-- 调用与计费：[llm.py:65](../src/babyrag/llm.py#L65)
-- 指纹：[llm.py:68](../src/babyrag/llm.py#L68)
-- token 从哪来：[llm.py:153](../src/babyrag/llm.py#L153)
-- 重试：[llm.py:109](../src/babyrag/llm.py#L109)
+- 调用与计费：[llm.py:67](../src/babyrag/llm.py#L67)
+- 指纹：[llm.py:70](../src/babyrag/llm.py#L70)
+- token 从哪来：[llm.py:158](../src/babyrag/llm.py#L158)
+- 重试：[llm.py:114](../src/babyrag/llm.py#L114)
 - SQLite 缓存：[cache.py:34](../src/babyrag/cache.py#L34)
 
 ## 检查一下

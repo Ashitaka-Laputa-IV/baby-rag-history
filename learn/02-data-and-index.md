@@ -166,7 +166,7 @@ CHUNK_OVERLAP = 64
 
 - 路径与价格：[config.py:57](../src/babyrag/config.py#L57)
 - 三套索引的路径：[config.py:28](../src/babyrag/config.py#L28)
-- 卡片与状态：[types.py:9](../src/babyrag/types.py#L9)、[types.py:47](../src/babyrag/types.py#L47)
+- 卡片与状态：[types.py:9](../src/babyrag/types.py#L9)、[types.py:48](../src/babyrag/types.py#L48)
 - 切卡片：[scripts/build_chunks.py](../scripts/build_chunks.py)
 - 造 masked 语料：[scripts/build_masked_corpus.py](../scripts/build_masked_corpus.py)
 

@@ -61,6 +61,9 @@ flowchart LR
 | 6 | [怎么证明它有效](06-evaluation.md) | 排行榜的数字到底怎么来的 |
 | 7 | [动手改代码](07-change-the-code.md) | 想改行为时从哪里下手 |
 
+想直接读代码？走 [`code-walkthrough/`](code-walkthrough/README.md)：按函数贴真实代码、
+逐行解释、标调用关系和坑。
+
 ## 读之前，先做一件事
 
 如果你愿意，先跑一遍：

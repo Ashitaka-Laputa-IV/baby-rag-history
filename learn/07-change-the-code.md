@@ -84,8 +84,8 @@ hits = (state.get("hits") or [])[:5]
 
 1. 在 [eval.py:116](../src/babyrag/eval.py#L116) 的 `_score` 里，用 `result["citations"]`
    和 `hits` 建映射，判断是否和 `gold_docs` 相交。
-2. 在 [eval.py:177](../src/babyrag/eval.py#L177) 的 `summarize` 里用 `_mean` 汇总。
-3. 在 [eval.py:275](../src/babyrag/eval.py#L275) 的 `write_reports` 加一列。
+2. 在 [eval.py:188](../src/babyrag/eval.py#L188) 的 `summarize` 里用 `_mean` 汇总。
+3. 在 [eval.py:289](../src/babyrag/eval.py#L289) 的 `write_reports` 加一列。
 4. 在 `docs/evaluation.md` 补定义。
 
 ## 改法四：修 masked 的标题泄漏
